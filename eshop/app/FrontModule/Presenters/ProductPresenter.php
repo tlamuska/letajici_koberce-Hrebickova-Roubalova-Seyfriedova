@@ -2,9 +2,11 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\FrontModule\Components\ProductCartForm\ProductCartForm;
 use App\FrontModule\Components\ProductCartForm\ProductCartFormFactory;
 use App\Model\Facades\ProductsFacade;
 use Nette\Application\BadRequestException;
+use Nette\Application\UI\Multiplier;
 
 /**
  * Class ProductPresenter
@@ -32,6 +34,31 @@ class ProductPresenter extends BasePresenter{
 
     $this->template->product = $product;
   }
+
+protected function createComponentProductCartForm():Multiplier {
+    return new Multiplier(function($productId){
+        // vytvoříme 1 instanci formuláře
+        $form = $this->productCartFormFactory->create();
+        $form->setDefaults(['productId' => $productId]);
+        $form->onSubmit[]=function(ProductCartForm $form){
+            try {
+                $product = $this->productsFacade->getProduct($form->values->productId);
+            } catch (Exception $e) {
+                $this->flashMessage('Produkt nenalezen.');
+                $this->redirect('list');
+            }
+
+            $cart = $this->getComponent('cart');
+            $cart->addToCart($product, $form->values->count);
+
+            //pošleme uživatele zpět na stránku, ze které chtěl zboží přidat
+            $this->flashMessage('Produkt přidán do košíku');
+            $this->redirect('this');
+        };
+
+        return $form;
+    });
+}
 
   /**
    * Akce pro vykreslení přehledu produktů
