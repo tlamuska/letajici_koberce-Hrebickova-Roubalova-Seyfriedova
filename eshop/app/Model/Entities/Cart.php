@@ -15,28 +15,28 @@ use LeanMapper\Entity;
  */
 class Cart extends Entity{
 
-  public function updateCartItems(){
-    $this->row->cleanReferencingRowsCache('cart_item'); //smažeme cache, aby se položky v košíku znovu načetly z DB bez nutnosti načtení celého košíku
-  }
-
-  public function getTotalCount():int {
-    $result = 0;
-    if (!empty($this->items)){
-      foreach ($this->items as $item){
-        $result+=$item->count;
-      }
+    public function updateCartItems(){
+        $this->row->cleanReferencingRowsCache('cart_item'); //smažeme cache, aby se položky v košíku znovu načetly z DB bez nutnosti načtení celého košíku
     }
-    return $result;
-  }
 
-  public function getTotalPrice():float {
-    $result=0;
-    if (!empty($this->items)){
-      foreach ($this->items as $item){
-        $result+=$item->product->price*$item->count;
-      }
+    public function getTotalCount():int {
+        $result = 0;
+        if (!empty($this->items)){
+            foreach ($this->items as $item){
+                $result+=$item->count;
+            }
+        }
+        return $result;
     }
-    return $result;
-  }
+
+    public function getTotalPrice():float {
+        $result=0;
+        if (!empty($this->items)){
+            foreach ($this->items as $item){
+                $result+=$item->product->price*$item->count;
+            }
+        }
+        return $result;
+    }
 
 }
