@@ -1,4 +1,5 @@
 {varType App\Model\Entities\Product[] $products}
+{varType Nette\Utils\Paginator $paginator}
 {block content}
 
     <h1 n:block="title">Správa produktů</h1>
@@ -21,6 +22,16 @@
                 {/foreach}
             </tbody>
         </table>
+
+        {if $paginator->getPageCount() > 1}
+            <ul class="pagination">
+                {for $i = 1; $i <= $paginator->getPageCount(); $i++}
+                    <li class="page-item {if $paginator->getPage() === $i}active{/if}">
+                        <a class="page-link" n:href="this, page => $i">{$i}</a>
+                    </li>
+                {/for}
+            </ul>
+        {/if}
 
     {else}
         <p class="text-muted">Nebyly nalezeny žádné produkty</p>

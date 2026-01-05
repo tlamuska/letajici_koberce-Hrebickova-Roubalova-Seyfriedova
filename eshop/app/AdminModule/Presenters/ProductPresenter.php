@@ -6,6 +6,7 @@ use App\AdminModule\Components\ProductEditForm\ProductEditForm;
 use App\AdminModule\Components\ProductEditForm\ProductEditFormFactory;
 use App\Model\Facades\ProductsFacade;
 
+
 /**
  * Class ProductPresenter
  * @package App\AdminModule\Presenters
@@ -15,12 +16,39 @@ class ProductPresenter extends BasePresenter
     private ProductsFacade $productsFacade;
     private ProductEditFormFactory $productEditFormFactory;
 
+    /** @persistent */
+    public $page = 1;
+
     /**
      * Akce pro vykreslení seznamu produktů
      */
     public function renderDefault(): void
     {
-        $this->template->products = $this->productsFacade->findProducts(['order' => 'title']);
+
+        $paginator = new \Nette\Utils\Paginator();
+        $paginator->setItemCount($this->productsFacade->findProductsCount());
+        $paginator->setItemsPerPage(8);
+
+        $currentPage = min($this->page, $paginator->getPageCount());
+        $currentPage = max($currentPage, 1);
+
+        if ($this->page !== $currentPage) {
+            $this->redirect('this', ['page' => $currentPage]);
+        }
+
+        $paginator->setPage($currentPage);
+
+        $this->template->products = $this->productsFacade->findProducts(
+            ['order' => 'title'],
+            $paginator->getOffset(),
+            $paginator->getLength()
+        );
+
+        $this->template->paginator = $paginator;
+
+
+        #$this->template->products = $this->productsFacade->findProducts(['order' => 'title']);
+
     }
 
     /**
