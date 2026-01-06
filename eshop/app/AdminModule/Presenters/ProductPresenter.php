@@ -5,7 +5,8 @@ namespace App\AdminModule\Presenters;
 use App\AdminModule\Components\ProductEditForm\ProductEditForm;
 use App\AdminModule\Components\ProductEditForm\ProductEditFormFactory;
 use App\Model\Facades\ProductsFacade;
-
+use Nette\Utils\Paginator;
+use Nette\Utils\Strings;
 
 /**
  * Class ProductPresenter
@@ -19,14 +20,24 @@ class ProductPresenter extends BasePresenter
     /** @persistent */
     public $page = 1;
 
+    /** @persistent */
+    public $search = '';
+
     /**
      * Akce pro vykreslení seznamu produktů
      */
     public function renderDefault(): void
     {
+        $criteria = [];
 
-        $paginator = new \Nette\Utils\Paginator();
-        $paginator->setItemCount($this->productsFacade->findProductsCount());
+        if (!empty($this->search) && Strings::length($this->search) >= 3) {
+            $criteria['search'] = $this->search;
+        }
+
+        $paginator = new Paginator();
+        $productsCount = $this->productsFacade->findProductsCount($criteria);
+
+        $paginator->setItemCount($productsCount);
         $paginator->setItemsPerPage(8);
 
         $currentPage = min($this->page, $paginator->getPageCount());
@@ -38,16 +49,16 @@ class ProductPresenter extends BasePresenter
 
         $paginator->setPage($currentPage);
 
+        $criteria['order'] = 'title';
+
         $this->template->products = $this->productsFacade->findProducts(
-            ['order' => 'title'],
+            $criteria,
             $paginator->getOffset(),
             $paginator->getLength()
         );
 
         $this->template->paginator = $paginator;
-
-
-        #$this->template->products = $this->productsFacade->findProducts(['order' => 'title']);
+        $this->template->search = $this->search;
 
     }
 
