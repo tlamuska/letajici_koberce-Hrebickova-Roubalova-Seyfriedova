@@ -14,67 +14,67 @@ use Nette\Application\UI\Multiplier;
  * @property string $category
  */
 class ProductPresenter extends BasePresenter{
-  private ProductsFacade $productsFacade;
-  private ProductCartFormFactory $productCartFormFactory;
+    private ProductsFacade $productsFacade;
+    private ProductCartFormFactory $productCartFormFactory;
 
-  /** @persistent */
-  public string $category;
+    /** @persistent */
+    public string $category;
 
-  /**
-   * Akce pro zobrazení jednoho produktu
-   * @param string $url
-   * @throws BadRequestException
-   */
-  public function renderShow(string $url):void {
-    try{
-      $product = $this->productsFacade->getProductByUrl($url);
-    }catch (\Exception $e){
-      throw new BadRequestException('Produkt nebyl nalezen.');
+    /**
+     * Akce pro zobrazení jednoho produktu
+     * @param string $url
+     * @throws BadRequestException
+     */
+    public function renderShow(string $url):void {
+        try{
+            $product = $this->productsFacade->getProductByUrl($url);
+        }catch (\Exception $e){
+            throw new BadRequestException('Produkt nebyl nalezen.');
+        }
+
+        $this->template->product = $product;
     }
 
-    $this->template->product = $product;
-  }
+    protected function createComponentProductCartForm():Multiplier {
+        return new Multiplier(function($productId){
+            // vytvoříme 1 instanci formuláře
+            $form = $this->productCartFormFactory->create();
+            $form->setDefaults(['productId' => $productId]);
+            $form->onSubmit[]=function(ProductCartForm $form){
+                try {
+                    $product = $this->productsFacade->getProduct($form->values->productId);
+                } catch (Exception $e) {
+                    $this->flashMessage('Produkt nenalezen.');
+                    $this->redirect('list');
+                }
 
-protected function createComponentProductCartForm():Multiplier {
-    return new Multiplier(function($productId){
-        // vytvoříme 1 instanci formuláře
-        $form = $this->productCartFormFactory->create();
-        $form->setDefaults(['productId' => $productId]);
-        $form->onSubmit[]=function(ProductCartForm $form){
-            try {
-                $product = $this->productsFacade->getProduct($form->values->productId);
-            } catch (Exception $e) {
-                $this->flashMessage('Produkt nenalezen.');
-                $this->redirect('list');
-            }
+                $cart = $this->getComponent('cart');
+                $cart->addToCart($product, $form->values->count);
 
-            $cart = $this->getComponent('cart');
-            $cart->addToCart($product, $form->values->count);
+                //pošleme uživatele zpět na stránku, ze které chtěl zboží přidat
+                $this->flashMessage('Produkt přidán do košíku');
+                $this->redirect('this');
+            };
 
-            //pošleme uživatele zpět na stránku, ze které chtěl zboží přidat
-            $this->flashMessage('Produkt přidán do košíku');
-            $this->redirect('this');
-        };
+            return $form;
+        });
+    }
 
-        return $form;
-    });
-}
+    /**
+     * Akce pro vykreslení přehledu produktů
+     */
+    public function renderList():void {
+        //TODO tady by mělo přibýt filtrování podle kategorie, stránkování atp.
+        $this->template->products = $this->productsFacade->findProducts(['order'=>'title']);
+    }
 
-  /**
-   * Akce pro vykreslení přehledu produktů
-   */
-  public function renderList():void {
-    //TODO tady by mělo přibýt filtrování podle kategorie, stránkování atp.
-    $this->template->products = $this->productsFacade->findProducts(['order'=>'title']);
-  }
+    #region injections
+    public function injectProductsFacade(ProductsFacade $productsFacade):void {
+        $this->productsFacade=$productsFacade;
+    }
 
-  #region injections
-  public function injectProductsFacade(ProductsFacade $productsFacade):void {
-    $this->productsFacade=$productsFacade;
-  }
-
-  public function injectProductCartFormFactory(ProductCartFormFactory $productCartFormFactory):void {
-    $this->productCartFormFactory=$productCartFormFactory;
-  }
-  #endregion injections
+    public function injectProductCartFormFactory(ProductCartFormFactory $productCartFormFactory):void {
+        $this->productCartFormFactory=$productCartFormFactory;
+    }
+    #endregion injections
 }

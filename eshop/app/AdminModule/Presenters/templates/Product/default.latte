@@ -1,8 +1,28 @@
 {varType App\Model\Entities\Product[] $products}
+{varType Nette\Utils\Paginator $paginator}
+{varType string $search}
 {block content}
 
     <h1 n:block="title">Správa produktů</h1>
     {if !empty($products)}
+        <div class="card bg-light mb-4 mt-3">
+            <div class="card-body">
+                <form action="{link this}" method="get" class="form-inline d-flex gap-2">
+                <input type="text" name="search" class="form-control" placeholder="Hledat produkt (min. 3 znaky)..." value="{$search}">
+                <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search"></i> Hledat
+                    </button>
+                {if $search}
+                        <a href="{link this, search => null, page => 1}" class="btn btn-outline-danger">
+                            <i class="fa fa-times"></i> Zrušit
+                        </a>
+                    {/if}
+                </form>
+                {if $search && strlen($search) < 3}
+                    <small class="text-danger">Pro vyhledávání zadejte alespoň 3 znaky.</small>
+                {/if}
+            </div>
+        </div>
         <table class="table table-hover mt-4">
             <thead>
                 <tr>
@@ -21,6 +41,16 @@
                 {/foreach}
             </tbody>
         </table>
+
+        {if $paginator->getPageCount() > 1}
+            <ul class="pagination">
+                {for $i = 1; $i <= $paginator->getPageCount(); $i++}
+                    <li class="page-item {if $paginator->getPage() === $i}active{/if}">
+                        <a class="page-link" n:href="this, page => $i">{$i}</a>
+                    </li>
+                {/for}
+            </ul>
+        {/if}
 
     {else}
         <p class="text-muted">Nebyly nalezeny žádné produkty</p>
