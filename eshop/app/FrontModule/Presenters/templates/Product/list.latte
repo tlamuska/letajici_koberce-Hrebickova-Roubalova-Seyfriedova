@@ -1,4 +1,6 @@
 {varType App\Model\Entities\Product[] $products}
+{varType array $productImages}
+
 {block content}
 
 <h1 n:block="title">Nabízené produkty</h1>
@@ -6,7 +8,23 @@
 <section class="row" n:if="!empty($products)">
     {foreach $products as $product}
         <div class="col-md-6 col-lg-4 my-2 card">
-            <a href="{plink Product:show url=>$product->url}" class="h4">{$product->title}</a>
+
+            {var $img = $productImages[$product->productId] ?? null}
+
+            <a href="{plink Product:show url=>$product->url}" class="h4">
+                    {if $img}
+                        <img src="{$basePath}/img/products/{$img->filename}"
+                             alt="{$product->title}"
+                             style="max-width: 100%; height: 200px; object-fit: contain; display: block; margin: 0 auto; padding-top: 5px;">
+                    {else}
+                        <div class="bg-light d-flex align-items-center justify-content-center text-muted"
+                             style="height: 200px;">
+                            Bez obrázku
+                        </div>
+                    {/if}
+                    <a href="{plink Product:show url=>$product->url}" class="h4">{$product->title}</a>
+</a>
+
             {control productCartForm-$product->productId}
         </div>
     {/foreach}

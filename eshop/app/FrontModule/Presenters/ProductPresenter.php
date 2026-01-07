@@ -33,6 +33,7 @@ class ProductPresenter extends BasePresenter{
         }
 
         $this->template->product = $product;
+        $this->template->images = $this->productsFacade->getProductImages($product->productId);
     }
 
     protected function createComponentProductCartForm():Multiplier {
@@ -66,6 +67,20 @@ class ProductPresenter extends BasePresenter{
     public function renderList():void {
         //TODO tady by mělo přibýt filtrování podle kategorie, stránkování atp.
         $this->template->products = $this->productsFacade->findProducts(['order'=>'title']);
+        $productImages = [];
+
+        foreach($this->template->products as $product){
+            $images = $this->productsFacade->getProductImages($product->productId);
+            $mainImg = null;
+            foreach($images as $image){
+                if($image->is_main){
+                    $mainImg = $image;
+                    break;
+                }
+            }
+            $productImages[$product->productId] = $mainImg;
+        }
+        $this->template->productImages = $productImages;
     }
 
     #region injections
