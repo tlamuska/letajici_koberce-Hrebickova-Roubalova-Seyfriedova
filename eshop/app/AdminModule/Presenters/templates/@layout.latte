@@ -36,6 +36,9 @@
 				<li n:class="$presenter->isLinkCurrent('Category:*')?active, nav-item" n:if="$user->isAllowed('Admin:Category','default')">
 					<a class="nav-link" href="{plink Category:default}">Kategorie</a>
 				</li>
+				<li n:class="$presenter->isLinkCurrent('User:*')?active, nav-item" n:if="$user->isAllowed('Admin:User','default')">
+					<a class="nav-link" href="{plink User:default}">Uživatelé</a>
+				</li>
 			</ul>
 
 			<ul class="navbar-nav ml-auto">

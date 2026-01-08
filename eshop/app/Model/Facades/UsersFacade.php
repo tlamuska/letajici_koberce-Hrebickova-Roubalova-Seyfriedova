@@ -39,6 +39,14 @@ class UsersFacade{
     $this->forgottenPasswordRepository=$forgottenPasswordRepository;
   }
 
+    /**
+     * Metoda pro načtení všech uživatelů
+     * @return User[]
+     */
+    public function findUsers(): array {
+        return $this->userRepository->findAll();
+    }
+
   /**
    * Metoda pro načtení jednoho uživatele
    * @param int $id

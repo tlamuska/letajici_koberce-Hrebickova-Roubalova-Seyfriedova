@@ -1,0 +1,35 @@
+{varType App\Model\Entities\User[] $users}
+{block content}
+    <h1 n:block="title">Správa uživatelů</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Jméno</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $users as $u}
+            <tr>
+                <td>{$u->userId}</td> {* V LeanMapperu se mapuje na user_id v DB *}
+                <td>{$u->name}</td>
+                <td>{$u->email}</td>
+                <td>
+                    {if $u->role}
+                        {$u->role->roleId}
+                    {else}
+                        - bez role -
+                    {/if}
+                </td>
+                <td>
+                    <a n:href="edit $u->userId">Upravit</a>
+                </td>
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
+{/block}
