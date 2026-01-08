@@ -46,7 +46,6 @@ class UsersFacade{
     public function findUsers(): array {
         return $this->userRepository->findAll();
     }
-
   /**
    * Metoda pro načtení jednoho uživatele
    * @param int $id
@@ -189,6 +188,22 @@ class UsersFacade{
     return $this->roleRepository->findAll();
   }
 
+/**
+ * Metoda pro načtení jedné role
+ * @param string $roleId
+ * @return Role
+ * @throws \Exception
+ */
+public function getRole(string $roleId): Role {
+    // Načteme všechny role
+    $roles = $this->findRoles();
+    foreach ($roles as $role) {
+        if ($role->roleId === $roleId) {
+            return $role;
+        }
+    }
+    throw new \Exception("Role '$roleId' nebyla v databázi nalezena.");
+}
   /**
    * @return Permission[]
    */
