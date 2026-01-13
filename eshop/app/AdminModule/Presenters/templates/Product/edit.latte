@@ -16,7 +16,6 @@
             <strong style="width:100%; margin-bottom:10px;">Nahrané fotky:</strong>
 
             {foreach $productImages as $image}
-                {* Poznámka: $image je ActiveRow, lze přistupovat objektově $image->filename *}
                 <div style="
                     display:flex;
                     flex-direction:column;
@@ -41,7 +40,6 @@
                             padding: 5px 0;
                         ">Hlavní obrázek</div>
                     {else}
-                        {* OPRAVA: Použití odkazu místo formuláře *}
                         <a n:href="setMainImage! imageId => $image->image_id, productId => $product->productId"
                                 class="btn btn-sm btn-primary"
                                 style="width:100%; font-size:0.85rem; margin-bottom:4px;">
@@ -49,7 +47,7 @@
                         </a>
                     {/if}
 
-                    {* OPRAVA: Použití odkazu pro smazání + potvrzení *}
+
                     <a n:href="deleteImage! imageId => $image->image_id, productId => $product->productId"
                             class="btn btn-sm btn-danger"
                             style="width:100%; font-size:0.85rem;"
