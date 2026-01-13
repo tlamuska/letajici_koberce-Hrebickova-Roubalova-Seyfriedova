@@ -68,4 +68,10 @@ final class UserPresenter extends BasePresenter
         // přesměrování, aby se obnovil seznam
         $this->redirect('this');
     }
+
+    public function renderAdd(): void
+    {
+        // metoda pro vykreslení add.latte
+        $this->setView('add');
+    }
 }

@@ -56,15 +56,24 @@ class UsersFacade{
     return $this->userRepository->find($id);
   }
 
-  /**
-   * Metoda pro načtení jednoho uživatele podle e-mailu
-   * @param string $email
-   * @return User
-   * @throws \Exception
-   */
-  public function getUserByEmail(string $email):User {
-    return $this->userRepository->findBy(['email'=>$email]);
-  }
+/**
+ * Metoda pro načtení jednoho uživatele podle e-mailu (včetně ošetření nenalezení)
+ * @param string $email
+ * @return User|null
+ */
+public function getUserByEmail(string $email): ?User {
+    try {
+        // Pokud uživatel s tímto emailem neexistuje, BaseRepository vyhodí Exception
+        $user = $this->userRepository->findBy(['email' => $email]);
+
+        // jinak BaseRepository rovnou vrací entitu
+        return $user;
+
+    } catch (\Exception $e) {
+        // BaseRepository vyhodí chybu "Entity was not found" -> e-mail je volný, vrátíme null
+        return null;
+    }
+}
 
   /**
    * Metoda pro uložení uživatele

@@ -39,7 +39,17 @@ class UserEditForm extends Form
             ->setMaxLength(40); // Podle DB limitu
 
         $this->addEmail('email', 'E-mail')
-            ->setRequired('Musíte zadat e-mail');
+            ->setRequired('Musíte zadat e-mail')
+            ->addRule(function ($input) use ($userId) {
+                $existingUser = $this->usersFacade->getUserByEmail($input->value);
+
+                // pokud nikdo s tímto e-mailem neexistuje
+                if (!$existingUser) {
+                    return true;
+                }
+                // e-mail je volný jen tehdy, pokud je to ten samý uživatel, kterého právě editujeme
+                return $existingUser->userId == $userId->value;
+            }, 'Tento e-mail je již registrován u jiného uživatele.');
 
         #region role
         $roles = $this->usersFacade->findRoles();
