@@ -51,4 +51,21 @@ final class UserPresenter extends BasePresenter
         // Naplnění formuláře daty entity
         $this['userEditForm']->setDefaults($user);
     }
+    /**
+     * Signál pro smazání uživatele
+     * @param int $id
+     */
+    public function handleDelete(int $id): void
+    {
+        try {
+            $user = $this->usersFacade->getUser($id);
+            $this->usersFacade->deleteUser($user);
+            $this->flashMessage('Uživatel byl úspěšně smazán.', 'success');
+        } catch (\Exception $e) {
+            $this->flashMessage('Uživatele se nepodařilo smazat.', 'danger');
+        }
+
+        // přesměrování, aby se obnovil seznam
+        $this->redirect('this');
+    }
 }

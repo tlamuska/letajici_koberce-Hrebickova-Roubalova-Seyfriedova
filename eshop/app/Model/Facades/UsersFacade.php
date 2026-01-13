@@ -123,6 +123,32 @@ class UsersFacade{
     return new SimpleIdentity($user->userId,$roles,['name'=>$user->name,'email'=>$user->email]);
   }
 
+/**
+ * Metoda pro načtení jedné role
+ * @param string $roleId
+ * @return Role
+ * @throws \Exception
+ */
+public function getRole(string $roleId): Role {
+    // Načteme všechny role
+    $roles = $this->findRoles();
+    foreach ($roles as $role) {
+        if ($role->roleId === $roleId) {
+            return $role;
+        }
+    }
+    throw new \Exception("Role '$roleId' nebyla v databázi nalezena.");
+}
+
+/**
+ * Metoda pro smazání uživatele
+ * @param User $user
+ * @throws InvalidStateException
+ */
+public function deleteUser(User $user): void {
+    $this->userRepository->delete($user);
+}
+
   #region metody pro zapomenuté heslo
   /**
    * Metoda pro vygenerování a uložení nového záznamu pro obnovu hesla
@@ -187,23 +213,6 @@ class UsersFacade{
   public function findRoles():array {
     return $this->roleRepository->findAll();
   }
-
-/**
- * Metoda pro načtení jedné role
- * @param string $roleId
- * @return Role
- * @throws \Exception
- */
-public function getRole(string $roleId): Role {
-    // Načteme všechny role
-    $roles = $this->findRoles();
-    foreach ($roles as $role) {
-        if ($role->roleId === $roleId) {
-            return $role;
-        }
-    }
-    throw new \Exception("Role '$roleId' nebyla v databázi nalezena.");
-}
   /**
    * @return Permission[]
    */

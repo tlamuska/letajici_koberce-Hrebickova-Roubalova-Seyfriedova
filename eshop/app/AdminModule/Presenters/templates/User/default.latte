@@ -26,7 +26,13 @@
                     {/if}
                 </td>
                 <td>
-                    <a n:href="edit $u->userId">Upravit</a>
+                    <a n:href="edit $u->userId"
+                            class="btn btn-sm btn-primary">Upravit</a>
+                    <a n:href="delete! $u->userId"
+                            class="btn btn-sm btn-danger"
+                            onclick="return confirm('Opravdu chcete smazat uživatele {$u->name}?')">
+                        Smazat
+                    </a>
                 </td>
             </tr>
         {/foreach}
