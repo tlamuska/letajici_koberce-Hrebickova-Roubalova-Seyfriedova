@@ -10,6 +10,8 @@ final class UserPresenter extends BasePresenter
 {
     private UsersFacade $usersFacade;
     private UserEditFormFactory $userEditFormFactory;
+    /** @persistent */
+    public string $search = '';
 
     public function __construct(UsersFacade $usersFacade, UserEditFormFactory $userEditFormFactory)
     {
@@ -17,10 +19,26 @@ final class UserPresenter extends BasePresenter
         $this->userEditFormFactory = $userEditFormFactory;
     }
 
-    public function renderDefault(): void
+    /**
+     * @throws \Exception
+     */
+    public function renderDefault(int $page = 1): void
     {
-        // Získáváme pole entit User
-        $this->template->users = $this->usersFacade->findUsers();
+        // 1. Nastavení paginatoru
+        $paginator = new \Nette\Utils\Paginator;
+        $paginator->setItemCount($this->usersFacade->getUsersCount($this->search)); // Celkový počet
+        $paginator->setItemsPerPage(10); // Kolik lidí na stránku
+        $paginator->setPage($page);
+
+        // 2. Načtení dat pro aktuální stránku
+        $this->template->users = $this->usersFacade->findUsers(
+            $this->search ?: null,
+            $paginator->getLength(),
+            $paginator->getOffset()
+        );
+
+        $this->template->paginator = $paginator;
+        $this->template->search = $this->search;
     }
 
     protected function createComponentUserEditForm(): UserEditForm
@@ -73,5 +91,17 @@ final class UserPresenter extends BasePresenter
     {
         // metoda pro vykreslení add.latte
         $this->setView('add');
+    }
+    protected function createComponentSearchForm(): \Nette\Application\UI\Form
+    {
+        $form = new \Nette\Application\UI\Form;
+        $form->addText('query', 'Hledat:')
+            ->setDefaultValue($this->search);
+        $form->addSubmit('send', 'Hledat');
+        $form->onSuccess[] = function ($form, $values) {
+            // přesměrování na začátek s novým vyhledáváním
+            $this->redirect('this', ['search' => $values->query, 'page' => 1]);
+        };
+        return $form;
     }
 }

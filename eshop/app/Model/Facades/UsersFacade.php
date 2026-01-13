@@ -40,11 +40,28 @@ class UsersFacade{
   }
 
     /**
-     * Metoda pro načtení všech uživatelů
+     * Metoda pro načtení všech uživatelů včetně vyhledávání a stránkování
      * @return User[]
+     * @throws \Exception
      */
-    public function findUsers(): array {
-        return $this->userRepository->findAll();
+    public function findUsers(?string $query = null, ?int $limit = null, ?int $offset = null): array {
+        $filters = [];
+        if ($query) {
+            $filters[] = ['name LIKE %~like~ OR email LIKE %~like~ OR role_id LIKE %~like~', $query, $query, $query];
+        }
+
+        return $this->userRepository->findAllBy($filters, $offset, $limit);
+    }
+    /**
+     * Metoda pro zjištění celkového počtu uživatelů (pro paginator)
+     */
+    public function getUsersCount(?string $query = null): int {
+        $filters = [];
+        if ($query) {
+            // Stejná oprava SQL syntaxe jako výše
+            $filters[] = ['name LIKE %~like~ OR email LIKE %~like~ OR role_id LIKE %~like~', $query, $query, $query];
+        }
+        return (int)$this->userRepository->findCountBy($filters);
     }
   /**
    * Metoda pro načtení jednoho uživatele
