@@ -16,37 +16,37 @@ use Nextras\FormsRendering\Renderers\FormLayout;
  */
 class ProductCartForm extends Form{
 
-  use SmartObject;
+    use SmartObject;
 
-  private CartControl $cartControl;
+    private CartControl $cartControl;
 
-  /**
-   * ProductCartForm constructor.
-   * @param Nette\ComponentModel\IContainer|null $parent
-   * @param string|null $name
-   */
-  public function __construct(Nette\ComponentModel\IContainer $parent = null, string $name = null){
-    parent::__construct($parent, $name);
-    $this->setRenderer(new Bs4FormRenderer(FormLayout::VERTICAL));
-    $this->createSubcomponents();
-  }
+    /**
+     * ProductCartForm constructor.
+     * @param Nette\ComponentModel\IContainer|null $parent
+     * @param string|null $name
+     */
+    public function __construct(Nette\ComponentModel\IContainer $parent = null, string $name = null){
+        parent::__construct($parent, $name);
+        $this->setRenderer(new Bs4FormRenderer(FormLayout::VERTICAL));
+        $this->createSubcomponents();
+    }
 
-  /**
-   * Metoda pro předání komponenty košíku jako závislosti
-   * @param CartControl $cartControl
-   */
-  public function setCartControl(CartControl $cartControl):void {
-    $this->cartControl=$cartControl;
-  }
+    /**
+     * Metoda pro předání komponenty košíku jako závislosti
+     * @param CartControl $cartControl
+     */
+    public function setCartControl(CartControl $cartControl):void {
+        $this->cartControl=$cartControl;
+    }
 
-  private function createSubcomponents(){
-    $this->addHidden('productId');
-    $this->addInteger('count','Počet kusů')
-        ->setDefaultValue(1)
-        ->setRequired('Zadejte počet')
-      ->addRule(Form::RANGE,'Chybný počet kusů.',[1,100]);
+    private function createSubcomponents(){
+        $this->addHidden('productId');
+        $this->addInteger('count','Počet kusů')
+            ->setDefaultValue(1)
+            ->setRequired('Zadejte počet')
+            ->addRule(Form::RANGE,'Chybný počet kusů.',[1,100]);
 
-    $this->addSubmit('ok','přidat do košíku');
-  }
+        $this->addSubmit('ok','přidat do košíku');
+    }
 
 }

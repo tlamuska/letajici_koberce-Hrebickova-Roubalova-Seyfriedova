@@ -39,6 +39,30 @@ class UsersFacade{
     $this->forgottenPasswordRepository=$forgottenPasswordRepository;
   }
 
+    /**
+     * Metoda pro načtení všech uživatelů včetně vyhledávání a stránkování
+     * @return User[]
+     * @throws \Exception
+     */
+    public function findUsers(?string $query = null, ?int $limit = null, ?int $offset = null): array {
+        $filters = [];
+        if ($query) {
+            $filters[] = ['name LIKE %~like~ OR email LIKE %~like~ OR role_id LIKE %~like~', $query, $query, $query];
+        }
+
+        return $this->userRepository->findAllBy($filters, $offset, $limit);
+    }
+    /**
+     * Metoda pro zjištění celkového počtu uživatelů (pro paginator)
+     */
+    public function getUsersCount(?string $query = null): int {
+        $filters = [];
+        if ($query) {
+            // Stejná oprava SQL syntaxe jako výše
+            $filters[] = ['name LIKE %~like~ OR email LIKE %~like~ OR role_id LIKE %~like~', $query, $query, $query];
+        }
+        return (int)$this->userRepository->findCountBy($filters);
+    }
   /**
    * Metoda pro načtení jednoho uživatele
    * @param int $id
@@ -49,15 +73,24 @@ class UsersFacade{
     return $this->userRepository->find($id);
   }
 
-  /**
-   * Metoda pro načtení jednoho uživatele podle e-mailu
-   * @param string $email
-   * @return User
-   * @throws \Exception
-   */
-  public function getUserByEmail(string $email):User {
-    return $this->userRepository->findBy(['email'=>$email]);
-  }
+/**
+ * Metoda pro načtení jednoho uživatele podle e-mailu (včetně ošetření nenalezení)
+ * @param string $email
+ * @return User|null
+ */
+public function getUserByEmail(string $email): ?User {
+    try {
+        // Pokud uživatel s tímto emailem neexistuje, BaseRepository vyhodí Exception
+        $user = $this->userRepository->findBy(['email' => $email]);
+
+        // jinak BaseRepository rovnou vrací entitu
+        return $user;
+
+    } catch (\Exception $e) {
+        // BaseRepository vyhodí chybu "Entity was not found" -> e-mail je volný, vrátíme null
+        return null;
+    }
+}
 
   /**
    * Metoda pro uložení uživatele
@@ -115,6 +148,32 @@ class UsersFacade{
     //vytvoření a vrácení SimpleIdentity
     return new SimpleIdentity($user->userId,$roles,['name'=>$user->name,'email'=>$user->email]);
   }
+
+/**
+ * Metoda pro načtení jedné role
+ * @param string $roleId
+ * @return Role
+ * @throws \Exception
+ */
+public function getRole(string $roleId): Role {
+    // Načteme všechny role
+    $roles = $this->findRoles();
+    foreach ($roles as $role) {
+        if ($role->roleId === $roleId) {
+            return $role;
+        }
+    }
+    throw new \Exception("Role '$roleId' nebyla v databázi nalezena.");
+}
+
+/**
+ * Metoda pro smazání uživatele
+ * @param User $user
+ * @throws InvalidStateException
+ */
+public function deleteUser(User $user): void {
+    $this->userRepository->delete($user);
+}
 
   #region metody pro zapomenuté heslo
   /**
@@ -180,7 +239,6 @@ class UsersFacade{
   public function findRoles():array {
     return $this->roleRepository->findAll();
   }
-
   /**
    * @return Permission[]
    */

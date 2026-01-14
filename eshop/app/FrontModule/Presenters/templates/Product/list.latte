@@ -1,13 +1,77 @@
 {varType App\Model\Entities\Product[] $products}
+{varType array $productImages}
+{varType App\Model\Entities\Category[] $categories}
+{varType App\Model\Entities\Category|null $currentCategory}
+
 {block content}
 
-<h1 n:block="title">Nabízené produkty</h1>
+<div class="row">
+    <aside class="col-md-3 mb-4">
+        <div class="list-group">
+            <h4 class="mb-3">Kategorie</h4>
 
-<section class="row" n:if="!empty($products)">
-    {foreach $products as $product}
-        <div class="col-md-6 col-lg-4 my-2 card">
-            <a href="{plink Product:show url=>$product->url}" class="h4">{$product->title}</a>
-            {control productCartForm-$product->productId}
+            <a n:href="list category => null" class="list-group-item list-group-item-action {if !$currentCategory}active{/if}">
+                Všechny produkty
+            </a>
+
+            {foreach $categories as $cat}
+                {* Předpokládám, že kategorie má vlastnost categoryId a title *}
+                <a n:href="list category => $cat->categoryId" class="list-group-item list-group-item-action {if $currentCategory && $currentCategory->categoryId == $cat->categoryId}active{/if}">
+                    {$cat->title}
+                </a>
+            {/foreach}
         </div>
-    {/foreach}
-</section>
+    </aside>
+
+    <main class="col-md-9">
+
+        <h1 n:block="title" class="mb-4">
+            {if $currentCategory}
+                {$currentCategory->title}
+            {else}
+                Nabízené produkty
+            {/if}
+        </h1>
+
+        {if empty($products)}
+            <div class="alert alert-info">V této kategorii nejsou momentálně žádné produkty.</div>
+        {else}
+            <div class="row">
+                {foreach $products as $product}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+
+                            {var $img = $productImages[$product->productId] ?? null}
+
+                            <a href="{plink Product:show url=>$product->url}" class="d-block text-decoration-none">
+                                {if $img}
+                                    <img src="{$basePath}/img/products/{$img->filename}"
+                                         alt="{$product->title}"
+                                         class="card-img-top"
+                                         style="height: 200px; object-fit: contain; padding: 15px;">
+                                {else}
+                                    <div class="bg-light d-flex align-items-center justify-content-center text-muted card-img-top"
+                                         style="height: 200px;">
+                                        Bez obrázku
+                                    </div>
+                                {/if}
+                            </a>
+
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-center">
+                                    <a href="{plink Product:show url=>$product->url}" class="text-dark text-decoration-none">
+                                        {$product->title}
+                                    </a>
+                                </h5>
+
+                                <div class="mt-auto pt-2">
+                                    {control productCartForm-$product->productId}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/foreach}
+            </div>
+        {/if}
+    </main>
+</div>

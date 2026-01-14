@@ -1,6 +1,73 @@
 {varType App\Model\Entities\Product $product}
+{varType array $productImages}
+
 {block content}
+    <h1 n:block="title">Úprava produktu {$product->title}</h1>
 
-<h1 n:block="title">Úprava produktu {$product->title}</h1>
+    {control productEditForm}
 
-{control productEditForm}
+    {if $productImages && count($productImages) > 0}
+        <div class="existing-photos" style="
+            margin-top: 20px;
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+        ">
+            <strong style="width:100%; margin-bottom:10px;">Nahrané fotky:</strong>
+
+            {foreach $productImages as $image}
+                <div style="
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    width:140px;
+                    border:1px solid #ddd;
+                    padding:5px;
+                    border-radius:6px;
+                    background:#f9f9f9;
+                    box-sizing:border-box;
+                ">
+                    <img src="{$basePath}/img/products/{$image->filename}"
+                         style="width:100%; height:120px; object-fit:cover; margin-bottom:5px; border-radius:4px;" alt="Fotografie produktu" />
+
+                    {if $image->is_main}
+                        <div style="
+                            color:green;
+                            font-weight:bold;
+                            margin-bottom:4px;
+                            text-align:center;
+                            font-size:0.85rem;
+                            padding: 5px 0;
+                        ">Hlavní obrázek</div>
+                    {else}
+                        <a n:href="setMainImage! imageId => $image->image_id, productId => $product->productId"
+                                class="btn btn-sm btn-primary"
+                                style="width:100%; font-size:0.85rem; margin-bottom:4px;">
+                            Nastavit hlavní
+                        </a>
+                    {/if}
+
+
+                    <a n:href="deleteImage! imageId => $image->image_id, productId => $product->productId"
+                            class="btn btn-sm btn-danger"
+                            style="width:100%; font-size:0.85rem;"
+                            onclick="return confirm('Opravdu chcete odstranit obrázek?');">
+                        Odstranit
+                    </a>
+                </div>
+            {/foreach}
+        </div>
+    {/if}
+
+
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ccc;">
+        <h3>Odstranění produktu</h3>
+        <p class="text-muted">Tato akce je nevratná. Smazáním produktu odstraníte i všechny jeho fotografie.</p>
+
+        <a n:href="deleteProduct! productId => $product->productId"
+                class="btn btn-danger"
+                onclick="return confirm('OPRAVDU chcete smazat celý produkt „{$product->title}“? Tato akce nejde vrátit!');">
+            <i class="fa fa-trash"></i> Smazat produkt
+        </a>
+    </div>
+{/block}

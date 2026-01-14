@@ -1,3 +1,11 @@
+{varType string[] $images}
+
 {block content}
 TODO tady bude nějaký obsah e-shopu :)
 <h1 n:block="title">Admin test gitu</h1>
+
+
+{foreach $images as $img}
+    $base path od www jen relativní cesta, basepath jako v layout
+    <img src="{$img}"/>
+{/foreach}
