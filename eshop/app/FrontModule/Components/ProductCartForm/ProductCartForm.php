@@ -41,12 +41,34 @@ class ProductCartForm extends Form{
 
     private function createSubcomponents(){
         $this->addHidden('productId');
+
+        $colors = [
+            'red' => 'Červená',
+            'blue' => 'Modrá',
+            'green' => 'Zelená'
+        ];
+
+        $this->addSelect('color', 'Barva', $colors)
+            ->setDefaultValue('red')
+            ->setRequired('Vyberte prosím barvu.');
+
         $this->addInteger('count','Počet kusů')
             ->setDefaultValue(1)
             ->setRequired('Zadejte počet')
             ->addRule(Form::RANGE,'Chybný počet kusů.',[1,100]);
 
         $this->addSubmit('ok','přidat do košíku');
+    }
+
+
+    /**
+     * Koberce na míru
+     * @return void
+     */
+    public function addSizeInput(): void {
+        $this->addText('size', 'Rozměr (např. 120x200)')
+            ->setRequired('Zadejte prosím požadovaný rozměr.')
+            ->setHtmlAttribute('placeholder', 'Šířka x Délka');
     }
 
 }

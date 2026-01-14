@@ -15,7 +15,6 @@
             </a>
 
             {foreach $categories as $cat}
-                {* Předpokládám, že kategorie má vlastnost categoryId a title *}
                 <a n:href="list category => $cat->categoryId" class="list-group-item list-group-item-action {if $currentCategory && $currentCategory->categoryId == $cat->categoryId}active{/if}">
                     {$cat->title}
                 </a>
