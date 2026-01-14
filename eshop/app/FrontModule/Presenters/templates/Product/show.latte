@@ -2,6 +2,21 @@
 {varType array $images}
 
 {block content}
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
+            {if $product->category}
+                <li class="breadcrumb-item">
+                    <a n:href="Product:list category => $product->category->categoryId">
+                        {$product->category->title}
+                    </a>
+                </li>
+            {/if}
+            <li class="breadcrumb-item active" aria-current="page">{$product->title}</li>
+        </ol>
+    </nav> 
+
     <div class="row">
         <div class="col-md-6">
         {var $mainImage = null}

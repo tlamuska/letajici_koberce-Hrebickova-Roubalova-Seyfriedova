@@ -5,20 +5,21 @@ namespace App\FrontModule\Presenters;
 use App\FrontModule\Components\ProductCartForm\ProductCartForm;
 use App\FrontModule\Components\ProductCartForm\ProductCartFormFactory;
 use App\Model\Facades\ProductsFacade;
+use App\Model\Facades\CategoriesFacade;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Multiplier;
 
 /**
  * Class ProductPresenter
  * @package App\FrontModule\Presenters
- * @property string $category
+ * @property $category
  */
 class ProductPresenter extends BasePresenter{
     private ProductsFacade $productsFacade;
     private ProductCartFormFactory $productCartFormFactory;
-
+    private CategoriesFacade $categoriesFacade;
     /** @persistent */
-    public string $category;
+    public $category = null;
 
     /**
      * Akce pro zobrazení jednoho produktu
@@ -61,25 +62,52 @@ class ProductPresenter extends BasePresenter{
         });
     }
 
+
+
     /**
      * Akce pro vykreslení přehledu produktů
      */
     public function renderList():void {
         //TODO tady by mělo přibýt filtrování podle kategorie, stránkování atp.
-        $this->template->products = $this->productsFacade->findProducts(['order'=>'title']);
-        $productImages = [];
+        $criteria = [
+            'available' => true,
+            'order' => 'title',
+        ];
 
-        foreach($this->template->products as $product){
+        $currentCategory = null;
+        
+        if ($this->category !== null) {
+            $currentCategory = $this->categoriesFacade->getCategory($this->category);
+
+            if (!$currentCategory) {
+                throw new BadRequestException('Kategorie neexistuje.');
+            }
+
+            $criteria['category_id'] = $currentCategory->categoryId;
+        }
+
+        $products = $this->productsFacade->findProducts($criteria);
+
+        $this->template->products = $products;
+        $this->template->currentCategory = $currentCategory;
+        $this->template->categories = $this->categoriesFacade->findCategories();
+
+        // Obrázky produktů
+        $productImages = [];
+        foreach ($products as $product) {
             $images = $this->productsFacade->getProductImages($product->productId);
+
             $mainImg = null;
-            foreach($images as $image){
-                if($image->is_main){
+            foreach ($images as $image) {
+                if ($image->is_main) {
                     $mainImg = $image;
                     break;
                 }
             }
-            $productImages[$product->productId] = $mainImg;
+
+            $productImages[$product->productId] = $mainImg ?? ($images[0] ?? null);
         }
+
         $this->template->productImages = $productImages;
     }
 
@@ -90,6 +118,10 @@ class ProductPresenter extends BasePresenter{
 
     public function injectProductCartFormFactory(ProductCartFormFactory $productCartFormFactory):void {
         $this->productCartFormFactory=$productCartFormFactory;
+    }
+
+    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade):void {
+        $this->categoriesFacade=$categoriesFacade;
     }
     #endregion injections
 }

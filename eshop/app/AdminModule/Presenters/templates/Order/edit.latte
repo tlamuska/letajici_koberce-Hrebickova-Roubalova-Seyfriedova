@@ -1,0 +1,73 @@
+{varType App\Model\Entities\Order $order}
+{block content}
+
+<h1 n:block="title">Objednávka #{$order->orderId}</h1>
+
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Zákazník</h5>
+                <div><b>Jméno:</b> {$order->customerName}</div>
+                <div><b>Email:</b> {$order->customerEmail}</div>
+                {if $order->phone}<div><b>Telefon:</b> {$order->phone}</div>{/if}
+                <div class="mt-2"><b>Adresa:</b><br>{$order->deliveryAddress|breaklines}</div>
+                {if $order->note}<div class="mt-2"><b>Poznámka:</b><br>{$order->note|breaklines}</div>{/if}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Objednávka</h5>
+
+                <div><b>Vytvořeno:</b> {$order->createdAt|date:'j.n.Y H:i'}</div>
+
+                <div class="mt-2">
+                    <b>Stav:</b>
+                    <span>{$order->statusLabel}</span>
+                </div>
+
+                <div class="mt-2"><b>Platba:</b> {$order->paymentMethod}</div>
+                <div><b>Doprava:</b> {$order->shippingMethod} ({$order->shippingPrice} Kč)</div>
+
+                <hr>
+                <div><b>Mezisoučet:</b> {$order->itemsTotal} Kč</div>
+                <div><b>Celkem:</b> {$order->grandTotal} Kč</div>
+
+                <hr>
+
+                {control orderEditForm}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-3">Položky</h3>
+<table class="table table-sm table-hover">
+    <thead>
+    <tr>
+        <th>Produkt</th>
+        <th>Barva</th>
+        <th>Velikost</th>
+        <th class="text-end">Cena/ks</th>
+        <th class="text-end">Ks</th>
+        <th class="text-end">Celkem</th>
+    </tr>
+    </thead>
+    <tbody>
+    {foreach $items as $item}
+        <tr>
+            <td>{$item->productTitle}</td>
+            <td>{$item->color}</td>
+            <td>{$item->size}</td>
+            <td class="text-end">{$item->unitPrice} Kč</td>
+            <td class="text-end">{$item->count}</td>
+            <td class="text-end">{$item->lineTotal} Kč</td>
+        </tr>
+    {/foreach}
+    </tbody>
+</table>
+
+<a href="{link default}" class="btn btn-link">← zpět na seznam</a>

@@ -14,6 +14,7 @@
 	<link rel="apple-touch-icon" sizes="180x180" href="{$basePath}/img/favicon/favicon-180x180.png" />
 	<link rel="icon" href="{$basePath}/img/favicon/favicon.svg" type="image/svg+xml" />
 	<link rel="manifest" href="{plink Homepage:manifest}" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 	{block head}{/block}
 </head>
@@ -35,6 +36,12 @@
 				</li>
 				<li n:class="$presenter->isLinkCurrent('Category:*')?active, nav-item" n:if="$user->isAllowed('Admin:Category','default')">
 					<a class="nav-link" href="{plink Category:default}">Kategorie</a>
+				</li>
+				<li n:class="$presenter->isLinkCurrent('User:*')?active, nav-item" n:if="$user->isAllowed('Admin:User','default')">
+					<a class="nav-link" href="{plink User:default}">Uživatelé</a>
+				</li>
+				<li n:class="$presenter->isLinkCurrent('Order:*')?active, nav-item" n:if="$user->isAllowed('Admin:Order','default')">
+					<a class="nav-link" href="{plink Order:default}">Objednávky</a>
 				</li>
 			</ul>
 
