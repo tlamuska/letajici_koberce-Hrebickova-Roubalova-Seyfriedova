@@ -51,17 +51,15 @@ class UserRegistrationForm extends Form{
       ->setRequired('Zadejte své jméno')
       ->setHtmlAttribute('maxlength',40)
       ->addRule(Form::MAX_LENGTH,'Jméno je příliš dlouhé, může mít maximálně 40 znaků.',40);
-    $this->addEmail('email','E-mail')
-      ->setRequired('Zadejte platný email')
-      ->addRule(function(Nette\Forms\Controls\TextInput $input){
-        try{
-          $this->usersFacade->getUserByEmail($input->value);
-        }catch (\Exception $e){
-          //pokud nebyl uživatel nalezen (tj. je vyhozena výjimka), je to z hlediska registrace v pořádku
-          return true;
-        }
-        return false;
-      },'Uživatel s tímto e-mailem je již registrován.');
+      $this->addEmail('email','E-mail')
+          ->setRequired('Zadejte platný email')
+          ->addRule(function(Nette\Forms\Controls\TextInput $input){
+              // Zavoláme fasádu - ta teď vrací buď User nebo null
+              $existingUser = $this->usersFacade->getUserByEmail($input->value);
+
+              // Pokud je výsledek null, znamená to, že e-mail je volný -> vracíme true (vše je ok)
+              return $existingUser === null;
+          }, 'Uživatel s tímto e-mailem je již registrován.');
     $password=$this->addPassword('password','Heslo');
     $password
       ->setRequired('Zadejte požadované heslo')

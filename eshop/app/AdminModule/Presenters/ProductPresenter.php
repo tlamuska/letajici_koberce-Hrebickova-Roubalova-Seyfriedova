@@ -140,6 +140,7 @@ class ProductPresenter extends BasePresenter
      */
     public function handleDeleteProduct(int $productId): void
     {
+
         try {
             $product = $this->productsFacade->getProduct($productId);
 
@@ -148,15 +149,17 @@ class ProductPresenter extends BasePresenter
                 $this->redirect('this');
             }
 
-            $this->productsFacade->deleteProduct($productId);
-            $this->flashMessage('Produkt byl úspěšně smazán.', 'success');
+            $product->available = FALSE;
+            $this->productsFacade->saveProduct($product);
+
+            $this->flashMessage('Produkt byl úspěšně vyřazen z prodeje (skryt).', 'success');
             $this->redirect('default');
 
         } catch (\Nette\Application\AbortException $e) {
             // Tuto výjimku vyhazuje redirect, musíme ji nechat projít dál
             throw $e;
         } catch (\Exception $e) {
-            $this->flashMessage('Produkt se nepodařilo smazat: ' . $e->getMessage(), 'error');
+            $this->flashMessage('Chyba při změně stavu produktu: ' . $e->getMessage(), 'error');
             $this->redirect('this');
         }
     }

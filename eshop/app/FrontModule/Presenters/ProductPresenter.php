@@ -42,7 +42,22 @@ class ProductPresenter extends BasePresenter{
             // vytvoříme 1 instanci formuláře
             $form = $this->productCartFormFactory->create();
             $form->setDefaults(['productId' => $productId]);
+
+            try {
+                $product = $this->productsFacade->getProduct($productId);
+            } catch (\Exception $e) {
+            
+                return $form;
+            }
+
+   
+            if ($product->category && $product->category->categoryId === 6) {
+                $form->addSizeInput();
+            }
+
+
             $form->onSubmit[]=function(ProductCartForm $form){
+                $values = $form->getValues();
                 try {
                     $product = $this->productsFacade->getProduct($form->values->productId);
                 } catch (Exception $e) {
@@ -50,8 +65,20 @@ class ProductPresenter extends BasePresenter{
                     $this->redirect('list');
                 }
 
+
+                if ($product->category && $product->category->title === "Na míru" ) {
+                    $size = $values->size;
+                } else {
+                    $size = '90x170';
+                }
+
                 $cart = $this->getComponent('cart');
-                $cart->addToCart($product, $form->values->count);
+                $cart->addToCart(
+                    $product,
+                    $values->count,
+                    ['color' => $values->color ?? null,
+                        'size' => $size]
+                );
 
                 //pošleme uživatele zpět na stránku, ze které chtěl zboží přidat
                 $this->flashMessage('Produkt přidán do košíku');

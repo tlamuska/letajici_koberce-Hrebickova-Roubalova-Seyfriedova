@@ -12,7 +12,7 @@ use LeanMapper\Entity;
  * @property int $cartItemId
  * @property Product $product m:hasOne
  * @property Cart $cart m:hasOne
- * @property string $color
+ * @property string|null $color
  * @property string $size
  * @property int $count = 0
  */
