@@ -7,6 +7,7 @@ use App\Model\Facades\UsersFacade;
 use Nette;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
+use Nette\Security\Passwords;
 use Nette\SmartObject;
 use Nextras\FormsRendering\Renderers\Bs4FormRenderer;
 use Nextras\FormsRendering\Renderers\FormLayout;
@@ -20,13 +21,15 @@ class UserEditForm extends Form
     public array $onCancel = [];
 
     private UsersFacade $usersFacade;
+    private Passwords $passwords;
 
-    public function __construct(UsersFacade $usersFacade, Nette\ComponentModel\IContainer $parent = null, string $name = null)
+    public function __construct(UsersFacade $usersFacade, Passwords $passwords, Nette\ComponentModel\IContainer $parent = null, string $name = null)
     {
         parent::__construct($parent, $name);
         // Nastavení Bootstrap 4 rendereru podle vzoru
         $this->setRenderer(new Bs4FormRenderer(FormLayout::VERTICAL));
         $this->usersFacade = $usersFacade;
+        $this->passwords = $passwords;
         $this->createSubcomponents();
     }
 
@@ -34,11 +37,11 @@ class UserEditForm extends Form
     {
         $userId = $this->addHidden('userId'); // Skryté pole pro ID
 
-        $this->addText('name', 'Jméno uživatele')
+        $this->addText('name', 'Jméno uživatele *')
             ->setRequired('Musíte zadat jméno uživatele')
             ->setMaxLength(40); // Podle DB limitu
 
-        $this->addEmail('email', 'E-mail')
+        $this->addEmail('email', 'E-mail *')
             ->setRequired('Musíte zadat e-mail')
             ->addRule(function ($input) use ($userId) {
                 $existingUser = $this->usersFacade->getUserByEmail($input->value);
@@ -62,10 +65,19 @@ class UserEditForm extends Form
             ->setRequired(false);
         #endregion role
 
+        #region heslo
+        $password = $this->addPassword('password', 'Heslo')
+            ->setOption('description', 'Pokud heslo nevyplníte, bude u NOVÉHO uživatele vygenerováno automaticky. ');
+
+
+        $password->addRule(Form::MIN_LENGTH, 'Heslo musí mít alespoň 5 znaků.', 5);
+        #endregion heslo
+
         #region tlačítka
         $this->addSubmit('ok', 'Uložit')
             ->onClick[] = function (SubmitButton $button) {
             $values = $this->getValues('array');
+            $generatedPassword = null;
 
             // Načtení nebo vytvoření entity uživatele
             if (!empty($values['userId'])) {
@@ -83,6 +95,16 @@ class UserEditForm extends Form
             $user->name = $values['name'];
             $user->email = $values['email'];
 
+            // logika pro heslo
+            if (!empty($values['password'])) {
+                // 1. Admin zadal heslo ručně
+                $user->password = $this->passwords->hash($values['password']);
+            } elseif (empty($values['userId'])) {
+                // 2. Jde o nového uživatele a heslo je prázdné -> VYGENEROVAT
+                $generatedPassword = \Nette\Utils\Random::generate(10); // 10 znaků
+                $user->password = $this->passwords->hash($generatedPassword);
+            }
+
             // Přiřazení role jako entity
             if (!empty($values['roleId'])) {
                 $user->role = $this->usersFacade->getRole($values['roleId']);
@@ -94,7 +116,11 @@ class UserEditForm extends Form
             $this->usersFacade->saveUser($user);
 
             // Vyvolání callbacku pro dokončení
-            $this->onFinished('Uživatel byl úspěšně uložen.');
+            if ($generatedPassword) {
+                $this->onFinished("Uživatel byl vytvořen. Vygenerované heslo: **$generatedPassword** (doporučte uživateli změnu hesla)");
+            } else {
+                $this->onFinished('Uživatel byl úspěšně uložen.');
+            }
         };
 
         $this->addSubmit('storno', 'Zrušit')
