@@ -54,7 +54,7 @@ class OrderPresenter extends BasePresenter
         };
         $form->onFinished[] = function ($message = null) {
             if (!empty($message)) {
-                $this->flashMessage($message, 'error');
+                $this->flashMessage($message);
             }
             $this->redirect('this');
         };
