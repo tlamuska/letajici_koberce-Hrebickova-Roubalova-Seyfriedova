@@ -6,7 +6,10 @@ use App\Model\Entities\Order;
 use App\Model\Entities\OrderItem;
 use App\Model\Repositories\OrderItemRepository;
 use App\Model\Repositories\OrderRepository;
+use App\Model\Entities\User;
+use Dibi\Exception;
 use LeanMapper\Connection;
+use LeanMapper\Exception\InvalidStateException;
 
 /**
  * Class OrdersFacade
@@ -69,6 +72,23 @@ class OrdersFacade{
         $order = $this->orderRepository->find($orderId);
         $order->status = $newStatus;
         $this->orderRepository->persist($order);
+    }
+
+    /**
+     * Metoda pro získání objednávek jediného uživatele.
+     * @param int $userId
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return array
+     * @throws Exception
+     * @throws InvalidStateException
+     */
+    public function getUserOrders(int $userId, ?int $limit = null, ?int $offset = null): array
+    {
+        $filters = ['user_id' => $userId];
+
+        // volá se metoda findAllBy v repository
+        return $this->orderRepository->findAllBy($filters,'created_at DESC', $offset, $limit);
     }
 
 
