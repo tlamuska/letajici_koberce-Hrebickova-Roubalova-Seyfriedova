@@ -46,11 +46,11 @@ class ProductPresenter extends BasePresenter{
             try {
                 $product = $this->productsFacade->getProduct($productId);
             } catch (\Exception $e) {
-                // Pokud produkt neexistuje, vrátíme jen základní formulář
+            
                 return $form;
             }
 
-            // Teď už proměnná $product existuje, můžeme se ptát
+   
             if ($product->category && $product->category->categoryId === 6) {
                 $form->addSizeInput();
             }
