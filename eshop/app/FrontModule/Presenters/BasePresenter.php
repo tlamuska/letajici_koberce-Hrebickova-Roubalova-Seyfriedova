@@ -6,6 +6,7 @@ use App\FrontModule\Components\CartControl\CartControl;
 use App\FrontModule\Components\CartControl\CartControlFactory;
 use App\FrontModule\Components\UserLoginControl\UserLoginControl;
 use App\FrontModule\Components\UserLoginControl\UserLoginControlFactory;
+use App\Model\Facades\CartFacade;
 use Nette\Application\AbortException;
 use Nette\Application\ForbiddenRequestException;
 
@@ -16,6 +17,34 @@ use Nette\Application\ForbiddenRequestException;
 abstract class BasePresenter extends \Nette\Application\UI\Presenter {
   private UserLoginControlFactory $userLoginControlFactory;
   private CartControlFactory $cartControlFactory;
+  private CartFacade $cartFacade;
+
+    protected function beforeRender(): void // metoda se spustí před vykreslením každé šablony
+    {
+        parent::beforeRender();
+
+        $totalCount = 0;
+
+        if ($this->user->isLoggedIn()) {
+            try {
+                // získání košíku přihlášeného uživatele
+                $cart = $this->cartFacade->getCartByUser($this->user->getId());
+
+                if ($cart && isset($cart->items)) {
+                    // projdeme položky a sečteme kusy
+                    foreach ($cart->items as $item) {
+                        // hodnota ve sloupci 'count' z tabulky order_item/cart_item
+                        $totalCount += $item->count;
+                    }
+                }
+            } catch (\Exception $e) {
+                $totalCount = 0;
+            }
+        }
+
+        // přidání proměnné do všech šablon
+        $this->template->cartItemCount = $totalCount;
+    }
 
   /**
    * @throws ForbiddenRequestException
@@ -61,5 +90,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter {
   public function injectCartControlFactory(CartControlFactory $cartControlFactory):void {
     $this->cartControlFactory=$cartControlFactory;
   }
+
+    public function injectCartFacade(CartFacade $cartFacade): void {
+        $this->cartFacade = $cartFacade;
+    }
   #endregion injections
 }
