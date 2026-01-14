@@ -1,10 +1,97 @@
 {varType App\Model\Entities\Product $product}
+{varType array $images}
+
 {block content}
 
-<h1 n:block="title">{$product->title}</h1>
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
+            {if $product->category}
+                <li class="breadcrumb-item">
+                    <a n:href="Product:list category => $product->category->categoryId">
+                        {$product->category->title}
+                    </a>
+                </li>
+            {/if}
+            <li class="breadcrumb-item active" aria-current="page">{$product->title}</li>
+        </ol>
+    </nav> 
 
-<p>
-    {$product->description}
-</p>
+    <div class="row">
+        <div class="col-md-6">
+        {var $mainImage = null}
+        {foreach $images as $img}
+                {if $img->is_main}
+                    {var $mainImage = $img}
+                {/if}
+            {/foreach}
 
-{control productCartForm-$product->productId}
+        {if !$mainImage && count($images) > 0}
+                {var $mainImage = $images[0]}
+            {/if}
+
+        <div class="mb-3">
+                    {if $mainImage}
+                        <img id="main-product-image"
+                             src="{$basePath}/img/products/{$mainImage->filename}"
+                             alt="{$product->title}"
+                             class="img-fluid border rounded"
+                             style="width: 100%; object-fit: contain;">
+                    {else}
+                        <div class="bg-light d-flex align-items-center justify-content-center border rounded" style="height: 300px; color: #aaa;">
+                            Bez obrázku
+                        </div>
+                    {/if}
+        </div>
+
+        {if count($images) > 1}
+                <div class="d-flex flex-wrap" style="gap: 10px;">
+                    {foreach $images as $img}
+                        <a href="{$basePath}/img/products/{$img->filename}" class="thumbnail-link border rounded p-1" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                            <img src="{$basePath}/img/products/{$img->filename}"
+                                 alt="Náhled"
+                                 style="max-width: 100%; max-height: 100%;">
+                        </a>
+                    {/foreach}
+                </div>
+            {/if}
+        </div>
+
+        <div class="col-md-6">
+            <h1 n:block="title">{$product->title}</h1>
+
+            <div class="h2 text-primary my-3">
+                {$product->price|number:0, ',', ' '} Kč
+            </div>
+
+            <p class="lead">
+                {$product->description}
+            </p>
+
+            <hr>
+
+            <div class="mt-4">
+                {control productCartForm-$product->productId}
+            </div>
+        </div>
+    </div>
+
+{/block}
+
+{block scripts}
+{include parent}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainImage = document.getElementById('main-product-image');
+        const thumbnails = document.querySelectorAll('.thumbnail-link');
+
+        if (mainImage) {
+            thumbnails.forEach(function (thumbnail) {
+                thumbnail.addEventListener('click', function (event) {
+                    event.preventDefault(); //zastaví přesměrování
+                    mainImage.src = this.href;
+                });
+            });
+        }
+    });
+</script>

@@ -1,61 +1,119 @@
 {varType App\Model\Entities\Product[] $products}
+{varType App\Model\Entities\Category[] $categories}
 {varType Nette\Utils\Paginator $paginator}
 {varType string $search}
+{varType int $categoryId}
+{varType string $available}
+
 {block content}
 
-    <h1 n:block="title">Správa produktů</h1>
-    {if !empty($products)}
-        <div class="card bg-light mb-4 mt-3">
-            <div class="card-body">
-                <form action="{link this}" method="get" class="form-inline d-flex gap-2">
-                <input type="text" name="search" class="form-control" placeholder="Hledat produkt (min. 3 znaky)..." value="{$search}">
-                <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-search"></i> Hledat
+<style>
+    .product-link {
+        color: #212529;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .product-link:hover {
+        font-weight: bold;
+        color: #0d6efd;
+        text-decoration: underline;
+    }
+</style>
+
+<h1 n:block="title">Správa produktů</h1>
+
+<div class="card bg-light mb-4 mt-3">
+    <div class="card-body">
+        <form action="{link this}" method="get" class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+            <div class="d-flex gap-2">
+                <select name="categoryId" class="form-select" style="max-width: 200px;" onchange="this.form.submit()">
+                    <option value="">-- Kategorie --</option>
+                    {foreach $categories as $category}
+                        <option value="{$category->categoryId}" {if $categoryId == $category->categoryId}selected{/if}>
+                            {$category->title}
+                        </option>
+                    {/foreach}
+                </select>
+
+                <select name="available" class="form-select" style="max-width: 150px; padding: 2px;" onchange="this.form.submit()">
+                    <option value="" {if $available === null}selected{/if}>-- Dostupnost --</option>
+                    <option value="1" {if $available === '1'}selected{/if}>Nabízeno</option>
+                    <option value="0" {if $available === '0'}selected{/if}>Nedostupné</option>
+                </select>
+            </div>
+
+            <div class="d-flex gap-2 align-items-center">
+                <div class="input-group" style="max-width: 300px;">
+                    <input type="text" name="search" class="form-control" placeholder="Hledat produkt..." value="{$search}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-search">Hledat</i>
                     </button>
-                {if $search}
-                        <a href="{link this, search => null, page => 1}" class="btn btn-outline-danger">
-                            <i class="fa fa-times"></i> Zrušit
-                        </a>
-                    {/if}
-                </form>
-                {if $search && strlen($search) < 3}
-                    <small class="text-danger">Pro vyhledávání zadejte alespoň 3 znaky.</small>
+                </div>
+
+                {if $search || $categoryId || $available !== null}
+                    <a href="{link this, search => null, categoryId => null, available => null, page => 1}" class="btn btn-outline-danger text-nowrap">
+                        <i class="fa fa-times"></i> Zrušit
+                    </a>
                 {/if}
             </div>
-        </div>
-        <table class="table table-hover mt-4">
-            <thead>
-                <tr>
-                    <th scope="col">Název produktu</th>
-                    <th scope="col" class="col-xl-1 col-md-2">Akce</th>
-                </tr>
-            </thead>
-            <tbody>
-                {foreach $products as $product}
-                    <tr>
-                        <td>{$product->title}</td>
-                        <td class="text-nowrap">
-                            <a href="{link edit id=>$product->productId}" class="btn btn-sm btn-outline-primary">upravit</a>
-                        </td>
-                    </tr>
-                {/foreach}
-            </tbody>
-        </table>
+        </form>
 
-        {if $paginator->getPageCount() > 1}
-            <ul class="pagination">
-                {for $i = 1; $i <= $paginator->getPageCount(); $i++}
-                    <li class="page-item {if $paginator->getPage() === $i}active{/if}">
-                        <a class="page-link" n:href="this, page => $i">{$i}</a>
-                    </li>
-                {/for}
-            </ul>
+        {if $search && strlen($search) < 3}
+            <div class="text-end mt-1">
+                <small class="text-danger">Pro vyhledávání zadejte alespoň 3 znaky.</small>
+            </div>
         {/if}
+    </div>
+</div>
 
-    {else}
-        <p class="text-muted">Nebyly nalezeny žádné produkty</p>
+{if !empty($products)}
+    <table class="table table-hover mt-4" style="table-layout: fixed; width: 100%;">
+        <thead>
+        <tr>
+            <th scope="col" style="width: auto;">Název produktu</th>
+            <th scope="col" style="width: 150px;">Cena</th>
+            <th scope="col" style="width: 150px;">Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $products as $product}
+            <tr>
+                <td style="overflow: hidden;">
+                    <a href="{link edit id=>$product->productId}" class="product-link">
+                        {$product->title}
+                    </a>
+                    {if $product->category}
+                        <br><small class="text-muted">{$product->category->title}</small>
+                    {/if}
+                </td>
+
+                <td>
+                    {$product->price} Kč
+                </td>
+
+                <td class="text-nowrap">
+                    <a href="{link edit id=>$product->productId}" class="btn btn-sm btn-outline-primary">Upravit</a>
+                </td>
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {if $paginator->getPageCount() > 1}
+        <ul class="pagination">
+            {for $i = 1; $i <= $paginator->getPageCount(); $i++}
+                <li class="page-item {if $paginator->getPage() === $i}active{/if}">
+                    <a class="page-link" n:href="this, page => $i, search => $search, categoryId => $categoryId, available => $available">{$i}</a>
+                </li>
+            {/for}
+        </ul>
     {/if}
 
-    <div class="my-4">
-        <a href="{link add}" class="btn btn-primary">nový produkt</a>
-    </div>
+{else}
+    <p class="text-muted mt-3">Nebyly nalezeny žádné produkty odpovídající filtrům.</p>
+{/if}
+
+<div class="my-4">
+    <a href="{link add}" class="btn btn-primary">nový produkt</a>
+</div>

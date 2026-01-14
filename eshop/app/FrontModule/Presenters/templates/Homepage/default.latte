@@ -1,4 +1,169 @@
-{block content}
-TODO tady bude nějaký obsah e-shopu :)
+{varType App\Model\Entities\Product[] $products}
+{varType array $productImages}
+{varType array $catMap}
 
-<a href="{plink Product:list}">Pracovní výpis produktů</a>
+{block content}
+    <div class="container py-3">
+
+        <div class="text-center mb-3">
+            <h1 class="display-5 fw-bold">LÉTAJÍCÍ KOBERCE</h1>
+            <p class="lead text-muted">
+                Zapomeňte na dopravní zácpy a plná parkoviště.<br>
+                Cestujte do práce i za zábavou vzdušnou čarou. Rychle, tiše a ekologicky.
+            </p>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row g-4 mb-5 text-center justify-content-center">
+
+            <div class="col-md-4">
+                <div class="p-5 bg-light border rounded-3 h-100">
+                    <img src="{$basePath}/img/banners/basic.png"
+                         class="img-fluid mb-3 w-100 rounded"
+                         alt="Základní koberce">
+
+                    <h3>Základní koberce</h3>
+                    <p class="text-muted">Kvalitní standard pro každý domov.</p>
+                    <a n:href="Product:list category => ($catMap['Základní koberce'] ?? null)"
+                            class="btn btn-outline-dark mt-2 stretched-link">
+                        Prohlédnout
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-5 bg-light border rounded-3 h-100">
+                    <img src="{$basePath}/img/banners/special.png"
+                         class="img-fluid mb-3 w-100 rounded"
+                         alt="Speciální koberce">
+
+                    <h3>Speciální koberce</h3>
+                    <p class="text-muted">Unikátní materiály a vzory.</p>
+                    <a n:href="Product:list category => ($catMap['Speciální koberce'] ?? null)"
+                            class="btn btn-outline-dark mt-2 stretched-link">
+                        Prohlédnout
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-5 bg-light border rounded-3 h-100">
+                    <img src="{$basePath}/img/banners/measured.png"
+                         class="img-fluid mb-3 w-100 rounded"
+                         alt="Koberce na míru">
+
+                    <h3>Koberce na míru</h3>
+                    <p class="text-muted">Přizpůsobíme se vašim představám.</p>
+                    <a n:href="Product:list category => ($catMap['Koberce na míru'] ?? null)"
+                            class="btn btn-outline-dark mt-2 stretched-link">
+                        Poptat / Prohlédnout
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 class="text-center mb-4">NOVINKY</h2>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+        <style>
+            .product-swiper {
+                padding: 20px 40px;
+            }
+            .swiper-button-next,
+            .swiper-button-prev {
+                color: #333;
+                width: 30px;
+                height: 30px;
+            }
+            .swiper-button-next::after,
+            .swiper-button-prev::after {
+                font-size: 24px;
+                font-weight: bold;
+            }
+        </style>
+
+        <div class="container position-relative">
+            {if empty($products)}
+                <div class="alert alert-warning text-center">
+                    Zatím zde nejsou žádné produkty.
+                </div>
+            {else}
+                <div class="swiper product-swiper">
+                    <div class="swiper-wrapper">
+                        {foreach $products as $product}
+                            <div class="swiper-slide h-auto">
+                                <div class="card h-100 shadow-sm">
+                                    {var $img = $productImages[$product->productId] ?? null}
+
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                         style="height: 200px; overflow: hidden;">
+                                        <a n:href="Product:show url => $product->url"
+                                                class="d-flex w-100 h-100 align-items-center justify-content-center text-decoration-none">
+                                            <img src="{$basePath}/img/products/{$img ? $img->filename : 'default.png'}"
+                                                 alt="{$product->title}"
+                                                 class="img-fluid"
+                                                 style="max-height: 100%; object-fit: contain;">
+                                        </a>
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title">
+                                            <a n:href="Product:show url => $product->url"
+                                                    class="text-dark text-decoration-none">
+                                                {$product->title}
+                                            </a>
+                                        </h5>
+
+                                        <p class="card-text fw-bold fs-5 text-primary">
+                                            {$product->price|number:0, ',', ' '} Kč
+                                        </p>
+
+                                        <div class="mt-auto">
+                                            <a n:href="Product:show url => $product->url"
+                                                    class="btn btn-primary w-100">
+                                                Detail
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/foreach}
+                    </div>
+
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            {/if}
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                new Swiper(".product-swiper", {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    loop: true,
+                    pagination: {
+                        el: ".swiper-pagination",
+                        clickable: true,
+                        dynamicBullets: true,
+                    },
+                    navigation: {
+                        nextEl: ".swiper-button-next",
+                        prevEl: ".swiper-button-prev",
+                    },
+                    breakpoints: {
+                        576: { slidesPerView: 2 },
+                        768: { slidesPerView: 3 },
+                        1200:{ slidesPerView: 4 },
+                    },
+                });
+            });
+        </script>
+
+    </div>
+{/block}

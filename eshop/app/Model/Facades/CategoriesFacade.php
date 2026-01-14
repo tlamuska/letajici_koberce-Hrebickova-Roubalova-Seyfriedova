@@ -46,6 +46,14 @@ class CategoriesFacade{
     return $this->categoryRepository->findCountBy($params);
   }
 
+    /**
+     * Metoda pro získání všech kategorií
+     * @return Category[]
+     */
+    public function findAllCategories(): array {
+        return $this->findCategories(['order' => 'title']);
+    }
+
   /**
    * Metoda pro uložení kategorie
    * @param Category &$category

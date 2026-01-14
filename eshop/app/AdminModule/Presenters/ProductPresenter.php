@@ -5,6 +5,7 @@ namespace App\AdminModule\Presenters;
 use App\AdminModule\Components\ProductEditForm\ProductEditForm;
 use App\AdminModule\Components\ProductEditForm\ProductEditFormFactory;
 use App\Model\Facades\ProductsFacade;
+use App\Model\Facades\CategoriesFacade;
 use Nette\Utils\Paginator;
 use Nette\Utils\Strings;
 
@@ -16,12 +17,19 @@ class ProductPresenter extends BasePresenter
 {
     private ProductsFacade $productsFacade;
     private ProductEditFormFactory $productEditFormFactory;
+    private CategoriesFacade $categoriesFacade;
 
     /** @persistent */
     public $page = 1;
 
     /** @persistent */
     public $search = '';
+
+    /** @persistent */
+    public $categoryId = null;
+
+    /** @persistent */
+    public $available = null;
 
     /**
      * Akce pro vykreslení seznamu produktů
@@ -32,6 +40,14 @@ class ProductPresenter extends BasePresenter
 
         if (!empty($this->search) && Strings::length($this->search) >= 3) {
             $criteria['search'] = $this->search;
+        }
+
+        if (!empty($this->categoryId)) {
+            $criteria['category_id'] = $this->categoryId;
+        }
+
+        if ($this->available !== null) {
+            $criteria['available'] = (bool)$this->available;
         }
 
         $paginator = new Paginator();
@@ -59,6 +75,9 @@ class ProductPresenter extends BasePresenter
 
         $this->template->paginator = $paginator;
         $this->template->search = $this->search;
+        $this->template->categoryId = $this->categoryId;
+        $this->template->available = $this->available;
+        $this->template->categories = $this->categoriesFacade->findAllCategories();
 
     }
 
@@ -185,6 +204,12 @@ class ProductPresenter extends BasePresenter
     function injectProductEditFormFactory(ProductEditFormFactory $productEditFormFactory): void
     {
         $this->productEditFormFactory = $productEditFormFactory;
+    }
+
+    public
+    function injectCategoriesFacade(CategoriesFacade $categoriesFacade): void
+    {
+        $this->categoriesFacade = $categoriesFacade;
     }
 #endregion injections
 

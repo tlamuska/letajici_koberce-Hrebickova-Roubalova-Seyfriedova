@@ -1,0 +1,86 @@
+{varType App\Model\Entities\User[] $users}
+{varType Nette\Utils\Paginator $paginator}
+{block content}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 n:block="title">Správa uživatelů</h1>
+
+        <div class="d-flex gap-2">
+            {* Vyhledávací formulář *}
+            <form n:name="searchForm" class="form-inline mr-2">
+                <div class="input-group">
+                    <input n:name="query" class="form-control form-control-sm">
+                    <div class="input-group-append">
+                        <button n:name="send" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                {* Tlačítko pro zrušení hledání, pokud se hledá *}
+                <a n:if="$search" n:href="this, search => null" class="btn btn-sm btn-link text-danger">Zrušit hledání</a>
+            </form>
+
+            <a n:href="add" class="btn btn-success">
+                <i class="fa fa-plus"></i> Nový uživatel
+            </a>
+        </div>
+    </div>
+
+{if count($users) > 0}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Jméno</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $users as $u}
+            <tr>
+                <td>{$u->userId}</td> {* V LeanMapperu se mapuje na user_id v DB *}
+                <td>{$u->name}</td>
+                <td>{$u->email}</td>
+                <td>
+                    {if $u->role}
+                        {$u->role->roleId}
+                    {else}
+                        - bez role -
+                    {/if}
+                </td>
+                <td>
+                    <a n:href="edit $u->userId"
+                            class="btn btn-sm btn-primary">
+                        <i class="fa fa-pencil"></i> Upravit</a>
+                    <a n:href="delete! $u->userId"
+                            class="btn btn-sm btn-danger"
+                            onclick="return confirm('Opravdu chcete smazat uživatele {$u->name}?')">
+                        <i class="fa fa-trash"></i> Smazat
+                    </a>
+                </td>
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    <div n:if="$paginator->pageCount > 1" class="pagination-wrapper d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            <li n:class="page-item, $paginator->isFirst() ? disabled">
+                <a n:href="this, page => $paginator->getPage() - 1" class="page-link">Předchozí</a>
+            </li>
+
+            <li n:for="$i = $paginator->getFirstPage(); $i <= $paginator->getLastPage(); $i++"
+        n:class="page-item, $i == $paginator->getPage() ? active">
+                <a n:href="this, page => $i" class="page-link">{$i}</a>
+            </li>
+
+            <li n:class="page-item, $paginator->isLast() ? disabled">
+                <a n:href="this, page => $paginator->getPage() + 1" class="page-link">Další</a>
+            </li>
+        </ul>
+    </div>
+{else}
+    <div class="alert alert-info">Nebyli nalezeni žádní uživatelé odpovídající dotazu "{$search}".</div>
+{/if}
+{/block}
