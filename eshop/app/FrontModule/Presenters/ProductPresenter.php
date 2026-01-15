@@ -53,10 +53,19 @@ class ProductPresenter extends BasePresenter{
             }
 
 
-            if ($product->category && $product->category->categoryId === 6) {
-                $form->addSizeInput();
-            }
+            if ($product->category && $product->category->title === "Na míru") {
+                $form->addText('size', 'Zadejte rozměr:')
+                    ->setHtmlAttribute('placeholder', 'např. 120x200')
+                    ->setRequired('Zadejte prosím požadovaný rozměr.');
+            } else {
+                $velikosti = [
+                    '90x170' => 'Menší (90x170 cm)',
+                    '140x200' => 'Větší (140x200 cm)'
+                ];
 
+                $form->addSelect('size', 'Velikost:', $velikosti)
+                    ->setRequired('Vyberte prosím velikost koberce.');
+            }
 
             $form->onSubmit[]=function(ProductCartForm $form){
                 $values = $form->getValues();

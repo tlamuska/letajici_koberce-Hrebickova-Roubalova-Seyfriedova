@@ -69,33 +69,45 @@
 
             <div class="mt-4">
                 {form productCartForm-$product->productId}
-
                     <ul class="text-danger list-unstyled" n:ifcontent>
                         <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
                     </ul>
 
-                    <div class="mb-3">
-                        {label color class => 'form-label' /}
-                        {input color class => 'form-select'}
-                        <small class="text-danger" n:ifcontent>{inputError color}</small>
-                    </div>
+                    {* Pokud je produkt Příslušenství, zobrazíme JEN počet a cenu (která je už nad formulářem) *}
+                    {if $product->type === 'Prislusenstvi'}
 
-                    {if isset($form['size'])}
                         <div class="mb-3">
-                            {label size class => 'form-label' /}
-                            {input size class => 'form-control'}
-                            <small class="text-muted">Zadejte v cm (např. 120x200)</small>
-                            <small class="text-danger d-block" n:ifcontent>{inputError size}</small>
+                            {label count class => 'form-label' /}
+                {input count class => 'form-control'}
+                            <small class="text-danger" n:ifcontent>{inputError count}</small>
                         </div>
-                    {/if}
-           
-                    <div class="mb-3">
-                        {label count class => 'form-label' /}
-                        {input count class => 'form-control'}
-                        <small class="text-danger" n:ifcontent>{inputError count}</small>
-                    </div>
 
-               
+                    {else}
+                        {* Pokud je to Koberec, zobrazíme všechna pole (barva, rozměr, počet) *}
+
+                        <div class="mb-3">
+                            {label color class => 'form-label' /}
+                {input color class => 'form-select'}
+                            <small class="text-danger" n:ifcontent>{inputError color}</small>
+                        </div>
+
+                        {if isset($form['size'])}
+                            <div class="mb-3">
+                                {label size class => 'form-label' /}
+                    {input size class => 'form-control'}
+                                <small class="text-muted">Zadejte v cm (např. 120x200)</small>
+                                <small class="text-danger d-block" n:ifcontent>{inputError size}</small>
+                            </div>
+                        {/if}
+
+                        <div class="mb-3">
+                            {label count class => 'form-label' /}
+                {input count class => 'form-control'}
+                            <small class="text-danger" n:ifcontent>{inputError count}</small>
+                        </div>
+
+                    {/if}
+
                     {input ok class => 'btn btn-primary w-100'}
                 {/form}
             </div>

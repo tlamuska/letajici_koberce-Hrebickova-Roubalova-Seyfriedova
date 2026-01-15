@@ -1,0 +1,75 @@
+{block content}
+    <div class="container my-3">
+        <h1 n:block="title">Tutoriály a návody</h1>
+        <p class="text-muted">Vyberte si téma, které vás zajímá, a kliknutím jej rozbalte.</p>
+
+        <div class="accordion mt-4" id="tutorialAccordion">
+
+            <div class="card mb-2 border-light shadow-sm">
+                <div class="card-header bg-white p-0" id="headingOne">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left text-primary font-weight-bold p-3 decoration-none" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="fa fa-paper-plane mr-2"></i> Ovládání létajícího koberce
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#tutorialAccordion">
+                    <div class="card-body">
+                        <h5>Základy letu</h5>
+                        <p>Pro vzlet se posaďte doprostřed a pevně uchopte přední okraj koberce. Vyslovte aktivační heslo. Náklonem těla vpřed zrychlujete, záklonem brzdíte.</p>
+                        <div class="alert alert-info py-2">
+                            <small><strong>Tip:</strong> Při prvním letu se držte maximálně 2 metry nad zemí.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2 border-light shadow-sm">
+                <div class="card-header bg-white p-0" id="headingTwo">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left text-primary font-weight-bold p-3 collapsed decoration-none" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <i class="fa fa-magic mr-2"></i> Čištění koberců
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#tutorialAccordion">
+                    <div class="card-body">
+                        <p>Skvrny od jídla nebo pití odstraňujte okamžitě. Používejte pouze speciální přípravky určené pro magická vlákna, které najdete v naší sekci Příslušenství.</p>
+                        <ul>
+                            <li>Nikdy nepoužívejte bělidla.</li>
+                            <li>Čistěte krouživými pohyby směrem ke středu skvrny.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2 border-light shadow-sm">
+                <div class="card-header bg-white p-0" id="headingThree">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left text-primary font-weight-bold p-3 collapsed decoration-none" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <i class="fa fa-wrench mr-2"></i> Pravidelná údržba
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#tutorialAccordion">
+                    <div class="card-body">
+                        <p>Dlouhodobá péče zajišťuje, že koberec neztratí svou nosnost a barvu. Doporučujeme:</p>
+                        <ul>
+                            <li><strong>Vysávání:</strong> 2x týdně (vypněte funkci "vysávání magie" na svém vysavači).</li>
+                            <li><strong>Kartáčování:</strong> Jednou měsíčně pročešte třásně jemným hřebenem.</li>
+                            <li><strong>Uskladnění:</strong> Pokud nelétáte, uchovávejte koberec srolovaný v suchu.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+
+        .btn-link:hover, .btn-link:focus { text-decoration: none; }
+        .card-header button { font-size: 1.1rem; }
+    </style>
+{/block}
