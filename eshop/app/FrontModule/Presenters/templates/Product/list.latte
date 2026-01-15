@@ -64,10 +64,20 @@
                                         {$product->title}
                                     </a>
                                 </h5>
-
+                                <p class="card-text text-center text-primary fw-bold">
+                                    {$product->price|number:0, ',', ' '} Kč
+                                </p>
                                 <div class="mt-auto pt-2">
-                                    {control productCartForm-$product->productId}
+                                    <a href="{plink Product:show url=>$product->url}" class="btn btn-primary w-100">
+                                        Zobrazit produkt
+                                    </a>
                                 </div>
+
+
+
+    {*                                <div class="mt-auto pt-2">*}
+    {*                                    {control productCartForm-$product->productId}*}
+    {*                                </div>*}
                             </div>
                         </div>
                     </div>
