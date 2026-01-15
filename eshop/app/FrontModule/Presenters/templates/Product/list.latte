@@ -10,12 +10,14 @@
         <div class="list-group">
             <h4 class="mb-3">Kategorie</h4>
 
-            <a n:href="list category => null" class="list-group-item list-group-item-action {if !$currentCategory}active{/if}">
-                Všechny produkty
+            <a n:href="Product:list categoryText => null"
+                    class="list-group-item list-group-item-action {if !$currentCategory}active{/if}">
+                    Všechny produkty
             </a>
 
             {foreach $categories as $cat}
-                <a n:href="list category => $cat->categoryId" class="list-group-item list-group-item-action {if $currentCategory && $currentCategory->categoryId == $cat->categoryId}active{/if}">
+                <a n:href="Product:list categoryText => Nette\Utils\Strings::webalize($cat->title)"
+                        class="list-group-item list-group-item-action {if $currentCategory && $currentCategory->categoryId == $cat->categoryId}active{/if}">
                     {$cat->title}
                 </a>
             {/foreach}

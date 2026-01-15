@@ -37,6 +37,44 @@
 			</button>
 		</div>
 
+		<div class="container">
+
+			<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type=='error'?'danger':$flash->type} alert-dismissible mt-2" role="alert">
+				{$flash->message}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+
+			<nav aria-label="breadcrumb" class="mb-3">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
+
+					{ifset $product}
+						{if $product->category}
+							<li class="breadcrumb-item">
+								<a n:href="Product:list categoryText => Nette\Utils\Strings::webalize($product->category->title), category => null">
+									{$product->category->title}
+								</a>
+							</li>
+						{else}
+							<li class="breadcrumb-item">
+								<a n:href="Product:list">Všechny produkty</a>
+							</li>
+						{/if}
+						<li class="breadcrumb-item active" aria-current="page">{$product->title}</li>
+
+					{elseifset $currentCategory}
+						<li class="breadcrumb-item active" aria-current="page">{$currentCategory->title}</li>
+
+						{* Pokud není kategorie ani produkt, ale jsme v Product:list *}
+					{elseif $presenter->isLinkCurrent('Product:list')}
+						<li class="breadcrumb-item active" aria-current="page">Všechny produkty</li>
+
+					{/ifset}
+				</ol>
+			</nav>
+
 		<section>
 		{include content}
 		</section>
