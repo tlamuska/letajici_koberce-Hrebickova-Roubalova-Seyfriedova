@@ -47,7 +47,7 @@
 			</div>
 
 			<nav aria-label="breadcrumb" class="mb-3">
-				<ol class="breadcrumb">
+				<ol class="breadcrumb" style="background: none; padding-left: 0;">
 					<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
 
 					{ifset $product}
@@ -67,18 +67,32 @@
 					{elseifset $currentCategory}
 						<li class="breadcrumb-item active" aria-current="page">{$currentCategory->title}</li>
 
-						{* Pokud není kategorie ani produkt, ale jsme v Product:list *}
 					{elseif $presenter->isLinkCurrent('Product:list')}
 						<li class="breadcrumb-item active" aria-current="page">Všechny produkty</li>
 
+					{elseif $presenter->isLinkCurrent('Tutorial:default')}
+						<li class="breadcrumb-item active" aria-current="page">Návody</li>
+
 					{/ifset}
 				</ol>
+				<hr class="mt-0 mb-4">
 			</nav>
+
 
 		<section>
 		{include content}
 		</section>
 	</div>
+	</div><footer class="bg-light border-top mt-5 py-4">
+		<div class="container text-center text-muted">
+			<p class="mb-2">
+				<strong>Létající koberce</strong> | Nebeská ulice 123, 110 00 Praha | info@letajicikoberce.cz
+			</p>
+			<p class="small mb-0">
+				&copy; {php echo date('Y')} Létající koberce. Všechna práva vyhrazena.
+			</p>
+		</div>
+	</footer>
 
 	{block scripts}
 		<script src="https://nette.github.io/resources/js/3/netteForms.min.js"></script>

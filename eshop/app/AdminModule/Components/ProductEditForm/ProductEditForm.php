@@ -115,9 +115,19 @@ class ProductEditForm extends Form
 
             // přiřazení kategorie
             if (!empty($values['categoryId'])) {
-                $product->category = $this->categoriesFacade->getCategory($values['categoryId']);
+                // Načteme zvolenou kategorii z databáze
+                $category = $this->categoriesFacade->getCategory($values['categoryId']);
+                $product->category = $category;
+
+                if ($category->title === 'Příslušenství') {
+                    $product->type = 'Prislusenstvi';
+                } else {
+                    $product->type = 'Koberec';
+                }
+
             } else {
                 $product->category = null;
+                $product->type = 'Koberec';
             }
 
             // uložit produkt
