@@ -2,6 +2,27 @@
 {block content}
 
 <h1 n:block="title">Správa objednávek</h1>
+
+{* Vyhledávání *}
+<div class="d-flex align-items-center">
+    <form method="get" action="{plink default}" class="form-inline mr-3">
+        <div class="input-group">
+            <input name="userId"
+                   value="{$userId ?? ''}"
+                   class="form-control form-control-sm"
+                   placeholder="ID uživatele…">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <a n:href="default" class="btn btn-sm btn-outline-secondary">Smazat filtr</a>
+</div>
+
+
 {if !empty($orders)}
     <table class="table table-hover mt-4">
         <thead>
@@ -9,6 +30,7 @@
             <th scope="col">Objednávka ze dne:</th>
             <th scope="col">Id</th>
             <th scope="col">Cena</th>
+            <th scope="col">Id uživatele</th>
             <th scope="col">Email zákazníka</th>
             <th scope="col">Stav</th>
             <th scope="col" class="col-xl-1 col-md-2">Akce</th>
@@ -20,6 +42,7 @@
                 <td>{$order->createdAt|date:'j.n.Y H:i'}</td>
                 <td>{$order->orderId}</td>
                 <td>{$order->grandTotal} Kč</td>
+                <td>{$order->userId}</td>
                 <td>{$order->customerEmail}</td>
                 <td>{$order->statusLabel}</td>
                 <td class="text-nowrap">

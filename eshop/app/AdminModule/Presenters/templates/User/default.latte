@@ -49,10 +49,16 @@
                     </span>
                     </td>
                     <td class="text-nowrap text-right">
-                        {* MODRÝ OBRYS pro upravit *}
-                    <a href="{link edit id=>$u->userId}" class="btn btn-sm btn-outline-primary text-lowercase">upravit</a>
 
-                    {* ČERVENÝ OBRYS pro smazat *}
+                        <a n:href=":Admin:Order:default userId => $u->userId"
+                                class="btn btn-sm btn-outline-secondary text-lowercase">
+                            objednávky
+                        </a>
+
+                        {* MODRÝ OBRYS pro upravit *}
+                        <a href="{link edit id=>$u->userId}" class="btn btn-sm btn-outline-primary text-lowercase">upravit</a>
+
+                        {* ČERVENÝ OBRYS pro smazat *}
                         <a href="{link delete! id=>$u->userId}"
                            class="btn btn-sm btn-outline-danger text-lowercase ml-1"
                            onclick="return confirm('Opravdu chcete smazat uživatele {$u->name}?')">smazat</a>
@@ -62,7 +68,7 @@
             </tbody>
         </table>
 
-        {* Paginátor - také jen obrysy *}
+        {* Paginátor *}
         <div n:if="$paginator->pageCount > 1" class="d-flex justify-content-center mt-4">
             <ul class="pagination pagination-sm">
                 <li n:class="page-item, $paginator->isFirst() ? disabled">
