@@ -110,10 +110,9 @@
 
 			<nav aria-label="breadcrumb" class="mb-3">
 				<ol class="breadcrumb" style="background: none; padding-left: 0;">
-					<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
-
 					{ifset $product}
 						{if $product->category}
+							<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
 							<li class="breadcrumb-item">
 								<a n:href="Product:list q => null, categoryText => null, category => null">Produkty</a>
 							</li>
@@ -123,6 +122,7 @@
 								</a>
 							</li>
 						{else}
+							<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
 							<li class="breadcrumb-item">
 								<a n:href="Product:list categoryText => null, category => null">Všechny produkty</a>
 							</li>
@@ -130,15 +130,18 @@
 						<li class="breadcrumb-item active" aria-current="page">{$product->title}</li>
 
 					{elseifset $currentCategory}
+						<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
 						<li class="breadcrumb-item">
 							<a n:href="Product:list q => null, categoryText => null, category => null">Produkty</a>
 						</li>
 						<li class="breadcrumb-item active" aria-current="page">{$currentCategory->title}</li>
 
 					{elseif $presenter->isLinkCurrent('Product:list')}
+						<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
 						<li class="breadcrumb-item active" aria-current="page">Všechny produkty</li>
 
 					{elseif $presenter->isLinkCurrent('Tutorial:default')}
+						<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
 						<li class="breadcrumb-item active" aria-current="page">Návody</li>
 
 					{/ifset}
