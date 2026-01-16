@@ -24,18 +24,17 @@ class Authenticator implements \Nette\Security\Authenticator{
    * @inheritDoc
    */
   function authenticate(string $email, string $password):IIdentity {
-    try{
-      $user=$this->usersFacade->getUserByEmail($email);
-    }catch (\Exception $e){
-      //uživatel nebyl nalezen
-      throw new AuthenticationException('Uživatelský účet neexistuje.');
+      $user = $this->usersFacade->getUserByEmail($email);
+
+      if (!$user) {
+          throw new AuthenticationException('Uživatelský účet neexistuje.');
+      }
+
+      if ($user->password === null || !$this->passwords->verify($password, $user->password)) {
+          throw new AuthenticationException('Chybná kombinace e-mailu a hesla.');
+      }
+
+      return $this->usersFacade->getUserIdentity($user);
     }
 
-    if ($this->passwords->verify($password, $user->password)){
-      //hash hesla byl ověřen
-      return $this->usersFacade->getUserIdentity($user);
-    }else{
-      throw new AuthenticationException('Chybná kombinace e-mailu a hesla.');
-    }
-  }
 }
