@@ -30,10 +30,9 @@
 			}
 			.breadcrumb-item a:hover {
 				text-decoration: underline;
-				opacity: 0.8;
 			}
 
-			/* Mobilní optimalizace headeru */
+			/* Mobilní optimalizace */
 			@media (max-width: 991.98px) {
 				.header-logo { height: 50px !important; }
 				.navbar-collapse {
@@ -52,17 +51,17 @@
 
 <header class="bg-white border-bottom py-2 sticky-top shadow-sm">
 	<div class="container">
-		<nav class="navbar navbar-expand-lg navbar-light p-0 d-flex flex-column">
+		<nav class="navbar navbar-expand-lg navbar-light p-0 d-flex flex-column align-items-stretch">
 
-			{* HORNÍ ŘADA *}
+			{* HORNÍ ŘADA: Hamburger, Logo, Ikony *}
           <div class="d-flex align-items-center justify-content-between w-100">
 
-					{* MOBIL: HAMBURGER DOLEVA *}
+					{* MOBILNÍ HAMBURGER (zobrazí se jen na mobilu) *}
              <button class="navbar-toggler border-0 p-0 d-lg-none" type="button" data-toggle="collapse" data-target="#mainNav">
 							<i class="bi bi-list h2"></i>
              </button>
 
-             {* LOGO A NÁPIS (Nápis se na mobilu skryje) *}
+             {* LOGO A NÁPIS *}
 					<a n:href=":Front:Homepage:default q => null, categoryText => null" class="navbar-brand d-flex align-items-center m-0 p-0 text-dark" style="text-decoration: none;">
 						<img src="{$basePath}/img/logo/logo_moon.png" alt="Logo" height="80" class="header-logo mr-md-2">
 						<span class="h3 mb-0 font-weight-bold d-none d-md-inline text-lowercase" style="letter-spacing: -1px;">létající koberce</span>
@@ -79,29 +78,20 @@
 								</div>
                 </form>
 
-                {* Admin Toggle (jen PC) *}
-                {if $user->isLoggedIn() && $user->isInRole('admin')}
-							{var $isAdminModule = strpos($presenter->getName(), 'Admin:') === 0}
-							<div class="custom-control custom-switch mr-3 d-none d-md-block">
-								<input type="checkbox" class="custom-control-input" id="adminToggle" n:attr="checked => $isAdminModule" onchange="location.href = this.checked ? {plink :Admin:Dashboard:default} :{plink :Front:Homepage:default}">
-								<label class="custom-control-label small text-muted" for="adminToggle">Admin</label>
-							</div>
-						{/if}
-
                 {* Uživatelské menu *}
                 <div class="dropdown mx-2">
 								<a href="#" class="text-dark h4 mb-0" id="userMenu" data-toggle="dropdown">
 									<i class="bi bi-person-circle h3"></i>
 								</a>
-								<div class="dropdown-menu dropdown-menu-right shadow border-0">
+								<div class="dropdown-menu dropdown-menu-right shadow border-0 text-lowercase">
 									{if $user->isLoggedIn()}
 										<h6 class="dropdown-header">{$user->identity->name}</h6>
-										<a class="dropdown-item" n:href=":Front:Order:default">Moje objednávky</a>
+										<a class="dropdown-item" n:href=":Front:Order:default">moje objednávky</a>
 										<div class="dropdown-divider"></div>
-										<a class="dropdown-item text-danger" n:href=":Front:User:logout">Odhlásit se</a>
+										<a class="dropdown-item text-danger" n:href=":Front:User:logout">odhlásit se</a>
 									{else}
-										<a class="dropdown-item" n:href=":Front:User:login">Přihlásit se</a>
-										<a class="dropdown-item" n:href=":Front:User:register">Registrovat se</a>
+										<a class="dropdown-item" n:href=":Front:User:login">přihlásit se</a>
+										<a class="dropdown-item" n:href=":Front:User:register">registrovat se</a>
 									{/if}
 								</div>
                 </div>
@@ -118,18 +108,21 @@
 					</div>
           </div>
 
-          {* DOLNÍ ŘADA / COLLAPSE MENU *}
+          {* DOLNÍ ŘADA / COLLAPSE MENU (Kategorie) *}
 			<div class="collapse navbar-collapse w-100" id="mainNav">
-				<div class="d-flex border-top-lg pt-lg-2 mt-2 mt-lg-0 w-100 flex-column flex-lg-row justify-content-between">
-					<nav class="nav navbar-nav flex-column flex-lg-row text-lowercase">
-						<a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Základní'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Základní'] ?? null), q => null">Základní</a>
-						<a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Speciální'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Speciální'] ?? null), q => null">Speciální</a>
-						<a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Na míru'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Na míru'] ?? null), q => null">Na míru</a>
-						<a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Příslušenství'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Příslušenství'] ?? null), q => null">Příslušenství</a>
+				<div class="d-flex border-top-lg pt-lg-2 mt-2 mt-lg-0 w-100 flex-column flex-lg-row text-lowercase">
 
-						{* Návody zarovnané s kategoriemi *}
-						<a n:class="nav-link, text-dark, font-weight-bold, px-0, $presenter->isLinkCurrent(':Front:Tutorial:default') ? active" n:href=":Front:Tutorial:default">Návody</a>
+					<nav class="nav navbar-nav flex-column flex-lg-row w-100">
+						{* Kategorie VLEVO *}
+                   <a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Základní'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Základní'] ?? null), q => null">základní</a>
+                   <a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Speciální'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Speciální'] ?? null), q => null">speciální</a>
+                   <a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Na míru'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Na míru'] ?? null), q => null">na míru</a>
+                   <a n:class="nav-link, text-dark, font-weight-bold, px-0, mr-lg-4, $presenter->isLinkCurrent(':Front:Product:list', ['categoryText' => ($catMap['Příslušenství'] ?? null)]) ? active" n:href=":Front:Product:list categoryText => ($catMap['Příslušenství'] ?? null), q => null">příslušenství</a>
+
+                   {* NÁVODY: Na mobilu pod kategoriemi, na PC vpravo (ml-lg-auto) *}
+						<a n:class="nav-link, text-dark, font-weight-bold, px-0, ml-lg-auto, $presenter->isLinkCurrent(':Front:Tutorial:default') ? active" n:href=":Front:Tutorial:default">návody</a>
 					</nav>
+
 				</div>
 			</div>
 		</nav>
@@ -139,13 +132,12 @@
 <main class="flex-grow-1">
 	<div class="container mt-3">
 
-		{* Flash zprávy *}
-       <div n:foreach="$flashes as $flash" class="alert alert-{$flash->type=='error'?'danger':$flash->type} alert-dismissible mt-2" role="alert">
-				{$flash->message}
-				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-       </div>
+		<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type=='error'?'danger':$flash->type} alert-dismissible mt-2" role="alert">
+			{$flash->message}
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		</div>
 
-       {* Drobečková navigace - skryta na Homepage *}
+		{* Drobečky - skryty na Homepage *}
 		<nav n:if="!$presenter->isLinkCurrent('Homepage:default')" aria-label="breadcrumb" class="mb-3">
 			<ol class="breadcrumb" style="background: none; padding-left: 0;">
 				<li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
@@ -172,9 +164,9 @@
 </main>
 
 <footer class="bg-light border-top mt-auto py-4">
-	<div class="container text-center text-muted">
+	<div class="container text-center text-muted text-lowercase">
 		<p class="mb-2"><strong>Létající koberce</strong> | Nebeská ulice 123, 110 00 Praha | info@letajicikoberce.cz</p>
-		<p class="small mb-0 text-lowercase">&copy; {php echo date('Y')} létající koberce. všechna práva vyhrazena.</p>
+		<p class="small mb-0">&copy; {php echo date('Y')} létající koberce. všechna práva vyhrazena.</p>
 	</div>
 </footer>
 
