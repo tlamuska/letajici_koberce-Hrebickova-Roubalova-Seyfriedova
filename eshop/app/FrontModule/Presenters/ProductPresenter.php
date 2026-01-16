@@ -20,6 +20,8 @@ class ProductPresenter extends BasePresenter{
     //private CategoriesFacade $categoriesFacade;
     /** @persistent */
     public $category = null;
+    /** @persistent */
+    public $q = null; // parametr pro vyhledávání
 
     /**
      * Akce pro zobrazení jednoho produktu
@@ -86,9 +88,17 @@ class ProductPresenter extends BasePresenter{
             $criteria['category_id'] = $currentCategory->categoryId;
         }
 
-        $products = $this->productsFacade->findProducts($criteria);
-
+        // Filtrování podle vyhledávacího dotazu
+        if ($this->q !== null && $this->q !== '') {
+            $products = $this->productsFacade->searchProducts($this->q, $criteria);
+            $this->setView('search');
+        } else {
+            // Pokud nevyhledává, použijeme původní metodu findProducts
+            $criteria['order'] = 'title';
+            $products = $this->productsFacade->findProducts($criteria);
+        }
         $this->template->products = $products;
+        $this->template->q = $this->q;
         $this->template->currentCategory = $currentCategory;
         $this->template->categories = $this->categoriesFacade->findCategories();
 

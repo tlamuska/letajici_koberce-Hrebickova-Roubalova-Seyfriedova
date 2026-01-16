@@ -40,11 +40,14 @@
 
 
 				{* Vyhledávání *}
-				<form class="ml-auto" style="max-width: 200px;">
+				<form action="{plink :Front:Product:list}" method="get" class="ml-auto" style="max-width: 200px;">
 					<div class="input-group input-group-sm">
-						<input type="search" class="form-control border-right-0" placeholder="Hledat...">
+						{* Jméno inputu musí být stejné jako jméno persistentního parametru (q) *}
+						<input type="search" name="q" value="{$presenter->getParameter('q')}" class="form-control border-right-0" placeholder="Hledat...">
 						<div class="input-group-append">
-							<span class="input-group-text bg-transparent border-left-0"><i class="bi bi-search"></i></span>
+							<button type="submit" class="btn btn-sm border border-left-0 bg-transparent text-muted">
+								<i class="bi bi-search"></i>
+							</button>
 						</div>
 					</div>
 				</form>

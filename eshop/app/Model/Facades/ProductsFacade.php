@@ -73,6 +73,33 @@ class ProductsFacade
     {
         return $this->productRepository->findCountBy($params);
     }
+    /**
+     * Metoda pro fulltextové vyhledávání produktů
+     */
+    public function searchProducts(string $query, array $filters = [], int $offset = null, int $limit = null): array
+    {
+        return $this->productRepository->search($query, $filters, $offset, $limit);
+    }
+
+    /**
+     * Počet výsledků pro vyhledávání
+     */
+    public function searchProductsCount(string $query, array $filters = []): int
+    {
+        $fluent = $this->connection->command();
+        $fluent->select('COUNT(*)')
+            ->from('product p')
+            ->where('p.title LIKE ? OR p.description LIKE ?', '%' . $query . '%', '%' . $query . '%');
+        if (isset($filters['order'])) {
+            unset($filters['order']);
+        }
+
+        foreach ($filters as $key => $value) {
+            $fluent->where('p.' . $key . ' = ?', $value);
+        }
+
+        return (int)$fluent->fetchSingle();
+    }
 
     /**
      * Metoda pro uložení produktu
