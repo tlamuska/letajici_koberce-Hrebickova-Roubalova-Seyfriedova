@@ -6,6 +6,7 @@ namespace App\AdminModule\Presenters;
 use App\AdminModule\Components\OrderEditForm\OrderEditFormFactory;
 use App\AdminModule\Components\OrderEditForm\OrderEditForm;
 use App\Model\Facades\OrdersFacade;
+use Nette\Forms\Form;
 
 /**
  * Class OrderPresenter
@@ -17,10 +18,18 @@ class OrderPresenter extends BasePresenter
     private OrderEditFormFactory $orderEditFormFactory;
 
     /**
-     * Akce pro vykreslení seznamu objednávek
+     * Akce pro vykreslení seznamu objednávek (+ se searchem z uživatelů)
     */
-    public function renderDefault(): void {
-        $this->template->orders=$this->ordersFacade->findOrders();
+    public function renderDefault(?int $userId = null): void {
+        $this->template->userId = $userId;
+
+        if ($userId !== null) {
+            $this->template->orders = $this->ordersFacade->getUserOrders($userId);
+            // předvyplnění inputu
+            return;
+        }
+
+        $this->template->orders = $this->ordersFacade->findOrders();
     }
 
     /**
