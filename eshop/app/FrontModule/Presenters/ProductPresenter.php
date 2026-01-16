@@ -18,7 +18,11 @@ use Nette\Utils\Strings;
 class ProductPresenter extends BasePresenter{
     private ProductsFacade $productsFacade;
     private ProductCartFormFactory $productCartFormFactory;
-    private CategoriesFacade $categoriesFacade;
+    //private CategoriesFacade $categoriesFacade;
+    /** @persistent */
+    public $category = null;
+    /** @persistent */
+    public $q = null; // parametr pro vyhledávání
 
     /** @persistent */
     public $categoryText = null;
@@ -147,9 +151,17 @@ class ProductPresenter extends BasePresenter{
             $criteria['category_id'] = $currentCategory->categoryId;
         }
 
-        $products = $this->productsFacade->findProducts($criteria);
-
+        // Filtrování podle vyhledávacího dotazu
+        if ($this->q !== null && $this->q !== '') {
+            $products = $this->productsFacade->searchProducts($this->q, $criteria);
+            $this->setView('search');
+        } else {
+            // Pokud nevyhledává, použijeme původní metodu findProducts
+            $criteria['order'] = 'title';
+            $products = $this->productsFacade->findProducts($criteria);
+        }
         $this->template->products = $products;
+        $this->template->q = $this->q;
         $this->template->currentCategory = $currentCategory;
         $this->template->categories = $this->categoriesFacade->findCategories();
 
@@ -181,8 +193,8 @@ class ProductPresenter extends BasePresenter{
         $this->productCartFormFactory=$productCartFormFactory;
     }
 
-    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade):void {
-        $this->categoriesFacade=$categoriesFacade;
-    }
+//    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade):void {
+//        $this->categoriesFacade=$categoriesFacade;
+//    }
     #endregion injections
 }

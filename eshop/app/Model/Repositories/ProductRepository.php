@@ -68,4 +68,25 @@ class ProductRepository extends BaseRepository{
 
         return $query->fetchSingle();
     }
+
+    public function search(string $query, array $filters = [], int $offset = null, int $limit = null): array
+    {
+        $fluent = $this->connection->command();
+        $fluent->select('p.*')
+            ->from('product p')
+            ->where('p.title LIKE ? OR p.description LIKE ?', '%' . $query . '%', '%' . $query . '%');
+        if (!empty($filters['order'])) {
+            $fluent->orderBy('p.' . $filters['order']);
+            unset($filters['order']);
+        }
+        foreach ($filters as $key => $value) {
+            $fluent->where('p.' . $key . ' = ?', $value);
+        }
+
+        if ($limit !== null) $fluent->limit($limit);
+        if ($offset !== null) $fluent->offset($offset);
+
+        $rows = $fluent->fetchAll();
+        return $this->createEntities($rows);
+    }
 }

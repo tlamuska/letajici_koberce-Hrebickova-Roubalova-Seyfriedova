@@ -6,8 +6,11 @@ use App\FrontModule\Components\CartControl\CartControl;
 use App\FrontModule\Components\CartControl\CartControlFactory;
 use App\FrontModule\Components\UserLoginControl\UserLoginControl;
 use App\FrontModule\Components\UserLoginControl\UserLoginControlFactory;
+use App\Model\Facades\CartFacade;
+use App\Model\Facades\CategoriesFacade;
 use Nette\Application\AbortException;
 use Nette\Application\ForbiddenRequestException;
+use Nette\Utils\Strings;
 
 /**
  * Class BasePresenter
@@ -16,6 +19,35 @@ use Nette\Application\ForbiddenRequestException;
 abstract class BasePresenter extends \Nette\Application\UI\Presenter {
   private UserLoginControlFactory $userLoginControlFactory;
   private CartControlFactory $cartControlFactory;
+  private CartFacade $cartFacade;
+    /** @inject */
+    public CategoriesFacade $categoriesFacade;
+
+    protected function beforeRender(): void // metoda se spustí před vykreslením každé šablony
+    {
+        parent::beforeRender();
+        // přidání proměnné do všech šablon
+        $this->template->cartItemCount = $this['cart']->getTotalCount();
+
+        $categories = $this->categoriesFacade->findAllCategories();
+        $this->template->categories = $categories;
+
+        $catMap = [];
+        foreach ($categories as $cat) {
+            // slug z názvu (např. 'Základní' -> 'zakladni')
+            $slug = Strings::webalize($cat->title);
+
+            // klíčem je název, hodnotou je slug (pro hezká URL)
+            $catMap[$cat->title] = $slug;
+
+            // Podpora pro dlaždice na Homepage
+            if ($cat->title === 'Základní') $catMap['Základní koberce'] = $slug;
+            if ($cat->title === 'Speciální') $catMap['Speciální koberce'] = $slug;
+            if ($cat->title === 'Na míru') $catMap['Koberce na míru'] = $slug;
+        }
+
+        $this->template->catMap = $catMap;
+    }
 
   /**
    * @throws ForbiddenRequestException
@@ -61,5 +93,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter {
   public function injectCartControlFactory(CartControlFactory $cartControlFactory):void {
     $this->cartControlFactory=$cartControlFactory;
   }
+
+    public function injectCartFacade(CartFacade $cartFacade): void {
+        $this->cartFacade = $cartFacade;
+    }
   #endregion injections
 }

@@ -38,7 +38,9 @@ class UserPresenter extends BasePresenter{
    */
   public function actionLogout():void {
     if ($this->user->isLoggedIn()){
-      $this->user->logout();
+        $this->getSession('cart')->remove('cartId'); // po odhlášení mažu košík ze session
+        $this->user->logout();
+        $this->flashMessage('Byli jste úspěšně odhlášeni.', 'success');
     }
     $this->redirect('Homepage:default');
   }

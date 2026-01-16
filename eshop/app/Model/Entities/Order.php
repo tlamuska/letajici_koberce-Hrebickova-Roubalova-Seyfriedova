@@ -2,6 +2,7 @@
 
 namespace App\Model\Entities;
 
+use DateTimeImmutable;
 use Dibi\DateTime;
 use LeanMapper\Entity;
 
@@ -24,6 +25,7 @@ use LeanMapper\Entity;
  * @property string $paymentMethod
  * @property float $grandTotal
  * @property DateTime|null $createdAt
+ * @property DateTimeImmutable|null $updatedAt
  *
  * @property OrderItem[] $items m:belongsToMany
  */
@@ -60,6 +62,9 @@ class Order extends Entity implements \Nette\Security\Resource
     {
         return self::statusLabel((string) $this->status);
     }
-
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->row->updated_at;
+    }
 
 }
