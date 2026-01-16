@@ -30,6 +30,8 @@ class ProductPresenter extends BasePresenter
 
     /** @persistent */
     public $available = null;
+    /** @persistent */
+    public $type = null;
 
     /**
      * Akce pro vykreslení seznamu produktů
@@ -37,17 +39,46 @@ class ProductPresenter extends BasePresenter
     public function renderDefault(): void
     {
         $criteria = [];
+        $categories = $this->categoriesFacade->findAllCategories();
 
+        // 2. Filtrování seznamu kategorií podle zvoleného typu pro SELECT
+        if ($this->type === 'Prislusenstvi') {
+            $categories = array_filter($categories, function($cat) {
+                return $cat->title === 'Příslušenství';
+            });
+        } elseif ($this->type === 'Koberec') {
+            $categories = array_filter($categories, function($cat) {
+                return $cat->title !== 'Příslušenství';
+            });
+        }
+
+        // 3. Logika resetu kategorie, pokud neodpovídá typu
+        if (!empty($this->type) && !empty($this->categoryId)) {
+            $categoryExists = false;
+            foreach ($categories as $cat) {
+                if ($cat->categoryId == $this->categoryId) {
+                    $categoryExists = true;
+                    break;
+                }
+            }
+            if (!$categoryExists) {
+                $this->categoryId = null;
+                $this->redirect('this', ['categoryId' => null]);
+            }
+        }
+
+        // 4. Sestavení kritérií pro vyhledávání produktů
         if (!empty($this->search) && Strings::length($this->search) >= 3) {
             $criteria['search'] = $this->search;
         }
-
         if (!empty($this->categoryId)) {
             $criteria['category_id'] = $this->categoryId;
         }
-
-        if ($this->available !== null) {
+        if ($this->available !== null && $this->available !== '') {
             $criteria['available'] = (bool)$this->available;
+        }
+        if (!empty($this->type)) {
+            $criteria['type'] = $this->type;
         }
 
         $paginator = new Paginator();
@@ -74,10 +105,11 @@ class ProductPresenter extends BasePresenter
         );
 
         $this->template->paginator = $paginator;
+        $this->template->categories = $categories;
         $this->template->search = $this->search;
         $this->template->categoryId = $this->categoryId;
         $this->template->available = $this->available;
-        $this->template->categories = $this->categoriesFacade->findAllCategories();
+        $this->template->type = $this->type;
 
     }
 
@@ -140,6 +172,7 @@ class ProductPresenter extends BasePresenter
      */
     public function handleDeleteProduct(int $productId): void
     {
+
         try {
             $product = $this->productsFacade->getProduct($productId);
 
@@ -148,15 +181,17 @@ class ProductPresenter extends BasePresenter
                 $this->redirect('this');
             }
 
-            $this->productsFacade->deleteProduct($productId);
-            $this->flashMessage('Produkt byl úspěšně smazán.', 'success');
+            $product->available = FALSE;
+            $this->productsFacade->saveProduct($product);
+
+            $this->flashMessage('Produkt byl úspěšně vyřazen z prodeje (skryt).', 'success');
             $this->redirect('default');
 
         } catch (\Nette\Application\AbortException $e) {
             // Tuto výjimku vyhazuje redirect, musíme ji nechat projít dál
             throw $e;
         } catch (\Exception $e) {
-            $this->flashMessage('Produkt se nepodařilo smazat: ' . $e->getMessage(), 'error');
+            $this->flashMessage('Chyba při změně stavu produktu: ' . $e->getMessage(), 'error');
             $this->redirect('this');
         }
     }

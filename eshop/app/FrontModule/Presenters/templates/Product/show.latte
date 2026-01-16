@@ -3,19 +3,7 @@
 
 {block content}
 
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a n:href="Homepage:default">Domů</a></li>
-            {if $product->category}
-                <li class="breadcrumb-item">
-                    <a n:href="Product:list category => $product->category->categoryId">
-                        {$product->category->title}
-                    </a>
-                </li>
-            {/if}
-            <li class="breadcrumb-item active" aria-current="page">{$product->title}</li>
-        </ol>
-    </nav> 
+
 
     <div class="row">
         <div class="col-md-6">
@@ -60,6 +48,15 @@
         <div class="col-md-6">
             <h1 n:block="title">{$product->title}</h1>
 
+            {if $product->category}
+                <p class="text-muted">
+                    Kategorie:
+                    <a n:href="Product:list categoryText => Nette\Utils\Strings::webalize($product->category->title)">
+                        {$product->category->title}
+                    </a>
+                </p>
+            {/if}
+
             <div class="h2 text-primary my-3">
                 {$product->price|number:0, ',', ' '} Kč
             </div>
@@ -71,7 +68,48 @@
             <hr>
 
             <div class="mt-4">
-                {control productCartForm-$product->productId}
+                {form productCartForm-$product->productId}
+                    <ul class="text-danger list-unstyled" n:ifcontent>
+                        <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+                    </ul>
+
+                    {* Pokud je produkt Příslušenství, zobrazíme JEN počet a cenu (která je už nad formulářem) *}
+                    {if $product->type === 'Prislusenstvi'}
+
+                        <div class="mb-3">
+                            {label count class => 'form-label' /}
+                {input count class => 'form-control'}
+                            <small class="text-danger" n:ifcontent>{inputError count}</small>
+                        </div>
+
+                    {else}
+                        {* Pokud je to Koberec, zobrazíme všechna pole (barva, rozměr, počet) *}
+
+                        <div class="mb-3">
+                            {label color class => 'form-label' /}
+                {input color class => 'form-select'}
+                            <small class="text-danger" n:ifcontent>{inputError color}</small>
+                        </div>
+
+                        {if isset($form['size'])}
+                            <div class="mb-3">
+                                {label size class => 'form-label' /}
+                    {input size class => 'form-control'}
+                                <small class="text-muted">Zadejte v cm (např. 120x200)</small>
+                                <small class="text-danger d-block" n:ifcontent>{inputError size}</small>
+                            </div>
+                        {/if}
+
+                        <div class="mb-3">
+                            {label count class => 'form-label' /}
+                {input count class => 'form-control'}
+                            <small class="text-danger" n:ifcontent>{inputError count}</small>
+                        </div>
+
+                    {/if}
+
+                    {input ok class => 'btn btn-primary w-100'}
+                {/form}
             </div>
         </div>
     </div>

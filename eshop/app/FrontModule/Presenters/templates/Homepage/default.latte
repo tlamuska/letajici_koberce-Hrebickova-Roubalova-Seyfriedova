@@ -18,46 +18,49 @@
         <div class="row g-4 mb-5 text-center justify-content-center">
 
             <div class="col-md-4">
-                <div class="p-5 bg-light border rounded-3 h-100">
+                <div class="p-5 bg-light border rounded-3 h-100 d-flex flex-column">
                     <img src="{$basePath}/img/banners/basic.png"
                          class="img-fluid mb-3 w-100 rounded"
                          alt="Základní koberce">
 
                     <h3>Základní koberce</h3>
                     <p class="text-muted">Kvalitní standard pro každý domov.</p>
-                    <a n:href="Product:list category => ($catMap['Základní koberce'] ?? null)"
-                            class="btn btn-outline-dark mt-2 stretched-link">
+
+                    <a n:href="Product:list categoryText => 'zakladni'"
+                            class="btn btn-outline-dark mt-auto stretched-link">
                         Prohlédnout
                     </a>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="p-5 bg-light border rounded-3 h-100">
+                <div class="p-5 bg-light border rounded-3 h-100 d-flex flex-column">
                     <img src="{$basePath}/img/banners/special.png"
                          class="img-fluid mb-3 w-100 rounded"
                          alt="Speciální koberce">
 
                     <h3>Speciální koberce</h3>
                     <p class="text-muted">Unikátní materiály a vzory.</p>
-                    <a n:href="Product:list category => ($catMap['Speciální koberce'] ?? null)"
-                            class="btn btn-outline-dark mt-2 stretched-link">
+
+                    <a n:href="Product:list categoryText => 'specialni'"
+                            class="btn btn-outline-dark mt-auto stretched-link">
                         Prohlédnout
                     </a>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="p-5 bg-light border rounded-3 h-100">
+                <div class="p-5 bg-light border rounded-3 h-100 d-flex flex-column">
                     <img src="{$basePath}/img/banners/measured.png"
                          class="img-fluid mb-3 w-100 rounded"
                          alt="Koberce na míru">
 
                     <h3>Koberce na míru</h3>
                     <p class="text-muted">Přizpůsobíme se vašim představám.</p>
-                    <a n:href="Product:list category => ($catMap['Koberce na míru'] ?? null)"
-                            class="btn btn-outline-dark mt-2 stretched-link">
-                        Poptat / Prohlédnout
+
+                    <a n:href="Product:list categoryText => 'na-miru'"
+                            class="btn btn-outline-dark mt-auto stretched-link">
+                        Prohlédnout
                     </a>
                 </div>
             </div>
