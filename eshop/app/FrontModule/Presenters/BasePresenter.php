@@ -22,28 +22,8 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter {
     protected function beforeRender(): void // metoda se spustí před vykreslením každé šablony
     {
         parent::beforeRender();
-
-        $totalCount = 0;
-
-        if ($this->user->isLoggedIn()) {
-            try {
-                // získání košíku přihlášeného uživatele
-                $cart = $this->cartFacade->getCartByUser($this->user->getId());
-
-                if ($cart && isset($cart->items)) {
-                    // projdeme položky a sečteme kusy
-                    foreach ($cart->items as $item) {
-                        // hodnota ve sloupci 'count' z tabulky order_item/cart_item
-                        $totalCount += $item->count;
-                    }
-                }
-            } catch (\Exception $e) {
-                $totalCount = 0;
-            }
-        }
-
         // přidání proměnné do všech šablon
-        $this->template->cartItemCount = $totalCount;
+        $this->template->cartItemCount = $this['cart']->getTotalCount();
     }
 
   /**

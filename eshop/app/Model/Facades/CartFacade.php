@@ -45,6 +45,17 @@ class CartFacade{
             $this->cartRepository->delete($this->getCartByUser($user));
         }catch (\Exception $e){}
     }
+    /**
+     * Metoda pro smazání košíku podle jeho ID
+     * @param int $id
+     */
+    public function deleteCartById(int $id): void {
+        try {
+            $cart = $this->getCartById($id);
+            $this->cartRepository->delete($cart);
+        } catch (\Exception $e) {
+        }
+    }
 
     /**
      * Metoda pro smazání starých košíků

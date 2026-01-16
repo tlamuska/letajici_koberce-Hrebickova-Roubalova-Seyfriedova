@@ -95,6 +95,7 @@ class CartControl extends Control{
         $this->user=$user;
         $this->cartFacade=$cartFacade;
         $this->cartSession=$session->getSection('cart');
+        $this->cartSession->setExpiration(2 * 24 * 60 * 60); // nastavení smazání anonymního košíku v session po 2 dnech
         $this->cart=$this->prepareCart();
     }
 
@@ -118,13 +119,14 @@ class CartControl extends Control{
      * Metoda pro přípravu košíku uloženého v DB
      */
     private function prepareCart():Cart {
+        $sessionCart = null;
         #region zkusíme najít košík podle ID ze session
         try {
             if ($cartId = $this->cartSession->get('cartId')){
-                $cart = $this->cartFacade->getCartById((int)$cartId);
+                $sessionCart = $this->cartFacade->getCartById((int)$cartId);
                 //zkontrolujeme, jestli tu není košík od předchozího uživatele, nebo se nepřihlásil uživatel s prázdným košíkem (případně ho zahodíme)
-                if (($cart->userId || empty($cart->items)) && ($cart->userId!=$this->user->id || !$this->user->isLoggedIn())){
-                    $cart=null;
+                if (($sessionCart->userId || empty($sessionCart->items)) && ($sessionCart->userId!=$this->user->id || !$this->user->isLoggedIn())){
+                    $sessionCart=null;
                 }
             }
         }catch (\Exception $e){
@@ -133,39 +135,91 @@ class CartControl extends Control{
         #endregion zkusíme najít košík podle ID ze session
         #region vyřešíme vazbu košíku na uživatele, případně vytvoříme košík nový
         if ($this->user->isLoggedIn()){
-            if ($cart){
-                //přiřadíme do košíku načteného podle session vazbu na aktuálního uživatele
-                if ($cart->userId != $this->user->id){
-                    $this->cartFacade->deleteCartByUser($this->user->id);
+            try {
+                // najdu košík, který už uživatel má v db u svého účtu
+                $userCart = $this->cartFacade->getCartByUser($this->user->id);
+                if ($sessionCart && $sessionCart->cartId != $userCart->cartId) {
+                    // jestli jsou dva různé košíky (původní a nový), tak je sloučíme
+                    $this->mergeCarts($userCart, $sessionCart);
+                    $cart = $userCart;
+                } else {
+                    $cart = $userCart;
                 }
-                $cart->userId=$this->user->id;
-                $this->cartFacade->saveCart($cart);
-            }else{
-                //zkusíme najít košík podle ID uživatele - pokud ho nenajdeme, vytvoříme nový
-                try{
-                    $cart=$this->cartFacade->getCartByUser($this->user->id);
-                }catch (\Exception $e){
-                    /*košík nebyl pro daného uživatele nalezen*/
-                    $cart=new Cart();
-                    $cart->userId=$this->user->id;
+            } catch (\Exception $e) {
+                // uživatel v db košík nemá
+                if ($sessionCart) {
+                    // Přiřadíme mu ten ze session
+                    $sessionCart->userId = $this->user->id;
+                    $this->cartFacade->saveCart($sessionCart);
+                    $cart = $sessionCart;
+                } else {
+                    // Vytvoříme úplně nový
+                    $cart = new Cart();
+                    $cart->userId = $this->user->id;
                     $this->cartFacade->saveCart($cart);
                     $this->deleteOldCarts();
                 }
             }
-        }elseif(!$cart){
-            //košík jsme zatím nijak nezvládli najít, vytvoříme nový prázdný
-            $cart=new Cart();
-            $this->cartFacade->saveCart($cart);
-            $this->deleteOldCarts();
+        } else {
+            // Nepřihlášený uživatel
+            if (!$sessionCart) {
+                $sessionCart = new Cart();
+                $this->cartFacade->saveCart($sessionCart);
+                $this->deleteOldCarts();
+            }
+            $cart = $sessionCart;
         }
-        #endregion vyřešíme vazbu košíku na uživatele, případně vytvoříme košík nový
-
         //aktualizujeme ID košíku v session
         $this->cartSession->set('cartId',$cart->cartId);
 
         return $cart;
     }
+    /**
+     * Pomocná metoda pro sloučení dvou košíků (pokud má uživatel uloženo v profilu něco z minula)
+     */
+    private function mergeCarts(Cart $targetCart, Cart $sourceCart): void {
+        $sourceCart->updateCartItems();
+        $targetCart->updateCartItems();
 
+        if ($sourceCart->items) {
+            foreach ($sourceCart->items as $sourceItem) {
+                $found = false;
+                if ($targetCart->items) {
+                    foreach ($targetCart->items as $targetItem) {
+                        // když je v obou košících stejný produkt, sečíst kusy
+                        if ($targetItem->product->productId == $sourceItem->product->productId) {
+                            $targetItem->count += $sourceItem->count;
+                            $this->cartFacade->saveCartItem($targetItem);
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$found) {
+                    // když produkt v cílovém košíku není -> změníme mu vazbu na cílový košík
+                    $sourceItem->cart = $targetCart;
+                    $this->cartFacade->saveCartItem($sourceItem);
+                }
+            }
+        }
+
+        // když je obsah původního anonymního kosšíku přenesený, anonymní k. se smaže
+        $this->cartFacade->deleteCartById($sourceCart->cartId);
+        // aktualizace košíku po sloučení a přepočtu
+        $targetCart->updateCartItems();
+    }
+    public function getTotalCount(): int
+    {
+        $total = 0;
+        // $this->cart už je v tuto chvíli v pořádku díky konstruktoru
+        if ($this->cart && $this->cart->items) {
+            foreach ($this->cart->items as $item) {
+                $total += $item->count;
+            }
+        }
+        return $total;
+    }
     /**
      * Metoda vytvářející šablonu komponenty
      * @param string $templateName=''
