@@ -18,45 +18,64 @@
 
 	{block head}{/block}
 </head>
-<body style="padding-top:4.5rem;">
+<body style="padding-top: 110px;">
 
-	<header class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-		<a class="navbar-brand" href="{plink Dashboard:default}">E-shop Admin</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Navigace">
+<header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm py-1">
+	<div class="container">
+		<a n:href=":Front:Homepage:default q => null, categoryText => null" class="navbar-brand m-0 p-0 mr-4">
+			<img src="{$basePath}/img/logo/logo_moon.png" alt="Logo" height="80">
+		</a>
+
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#adminNavbar">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
 		<nav class="collapse navbar-collapse" id="adminNavbar">
 			<ul class="navbar-nav mr-auto">
 				<li n:class="$presenter->isLinkCurrent('Dashboard:*')?active, nav-item">
-					<a class="nav-link" href="{plink Dashboard:default}">Dashboard</a>
+					<a class="nav-link font-weight-bold text-uppercase small" href="{plink Dashboard:default}">Dashboard</a>
 				</li>
 				<li n:class="$presenter->isLinkCurrent('Product:*')?active, nav-item" n:if="$user->isAllowed('Admin:Product','default')">
-					<a class="nav-link" href="{plink Product:default}">Produkty</a>
+					<a class="nav-link font-weight-bold text-uppercase small" href="{plink Product:default}">Produkty</a>
 				</li>
 				<li n:class="$presenter->isLinkCurrent('Category:*')?active, nav-item" n:if="$user->isAllowed('Admin:Category','default')">
-					<a class="nav-link" href="{plink Category:default}">Kategorie</a>
+					<a class="nav-link font-weight-bold text-uppercase small" href="{plink Category:default}">Kategorie</a>
 				</li>
 				<li n:class="$presenter->isLinkCurrent('User:*')?active, nav-item" n:if="$user->isAllowed('Admin:User','default')">
-					<a class="nav-link" href="{plink User:default}">Uživatelé</a>
+					<a class="nav-link font-weight-bold text-uppercase small" href="{plink User:default}">Uživatelé</a>
 				</li>
 				<li n:class="$presenter->isLinkCurrent('Order:*')?active, nav-item" n:if="$user->isAllowed('Admin:Order','default')">
-					<a class="nav-link" href="{plink Order:default}">Objednávky</a>
+					<a class="nav-link font-weight-bold text-uppercase small" href="{plink Order:default}">Objednávky</a>
 				</li>
 			</ul>
 
-			<ul class="navbar-nav ml-auto">
+			<ul class="navbar-nav ml-auto align-items-center">
+				<li class="nav-item">
+					{var $isAdminModule = strpos($presenter->getName(), 'Admin:') === 0}
+					<div class="custom-control custom-switch mr-3">
+						<input type="checkbox"
+							   class="custom-control-input"
+							   id="adminToggle"
+								n:attr="checked => $isAdminModule"
+							   onchange="location.href = this.checked ? {plink :Admin:Dashboard:default} : {plink :Front:Homepage:default}">
+						<label class="custom-control-label small text-light font-weight-bold" for="adminToggle">Admin režim</label>
+					</div>
+				</li>
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="adminNavbarUser" role="button" data-toggle="dropdown" aria-expanded="false">
+					<a class="nav-link dropdown-toggle font-weight-bold text-white" href="#" id="adminNavbarUser" role="button" data-toggle="dropdown">
+{*						<i class="fa fa-user-circle mr-1"></i> *}
 						{$user->identity->name}
 					</a>
-					<div class="dropdown-menu" aria-labelledby="adminNavbarUser">
-						<a class="dropdown-item" href="{plink :Front:User:logout}">Odhlásit se</a>
+					<div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="adminNavbarUser">
+
+
+						<a class="dropdown-item text-danger font-weight-bold" href="{plink :Front:User:logout}">Odhlásit se</a>
 					</div>
 				</li>
 			</ul>
 		</nav>
-	</header>
+	</div>
+</header>
 
 	<div class="container">
 
