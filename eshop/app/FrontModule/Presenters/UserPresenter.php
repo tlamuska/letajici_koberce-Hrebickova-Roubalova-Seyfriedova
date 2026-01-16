@@ -40,6 +40,9 @@ class UserPresenter extends BasePresenter{
     if ($this->user->isLoggedIn()){
       $this->user->logout();
       $this->getSession('checkout')->remove();
+      $this->getSession('cart')->remove('cartId'); // po odhlášení mažu košík ze session
+      $this->user->logout();
+      $this->flashMessage('Byli jste úspěšně odhlášeni.', 'success');
     }
     $this->redirect('Homepage:default');
   }

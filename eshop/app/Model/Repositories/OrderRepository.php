@@ -20,8 +20,17 @@ class OrderRepository extends BaseRepository
      * @throws \LeanMapper\Exception\InvalidStateException
      */
 
-    public function findAllBy($whereArr = null, $offset = null, $limit = null) {
+    public function findAllBy($whereArr = null, $order = null, $offset = null, $limit = null): array
+    {
         $query = $this->connection->select('*')->from($this->getTable());
+
+        if (!empty($whereArr)) {
+            $query->where($whereArr);
+        }
+
+        if ($order) {
+            $query->order($order);
+        }
 
         return $this->createEntities($query->fetchAll($offset, $limit));
     }

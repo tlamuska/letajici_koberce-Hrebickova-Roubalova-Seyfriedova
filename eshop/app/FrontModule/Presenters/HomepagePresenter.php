@@ -8,28 +8,28 @@ use App\Model\Facades\CategoriesFacade;
 class HomepagePresenter extends BasePresenter{
 
     private ProductsFacade $productsFacade;
-    private CategoriesFacade $categoriesFacade;
+//    private CategoriesFacade $categoriesFacade;
 
     public function renderDefault(): void
     {
-// Načtení kategorií
-        $categories = $this->categoriesFacade->findAllCategories();
-        $this->template->categories = $categories;
-
-        // Mapování pro výběr kategorie
-        $catMap = [
-            'Základní koberce' => null,
-            'Speciální koberce' => null,
-            'Koberce na míru' => null,
-        ];
-
-        foreach ($categories as $cat) {
-            if ($cat->title === 'Základní') $catMap['Základní koberce'] = $cat->categoryId;
-            if ($cat->title === 'Speciální') $catMap['Speciální koberce'] = $cat->categoryId;
-            if ($cat->title === 'Na míru') $catMap['Koberce na míru'] = $cat->categoryId;
-        }
-
-        $this->template->catMap = $catMap;
+//// Načtení kategorií
+//        $categories = $this->categoriesFacade->findAllCategories();
+//        $this->template->categories = $categories;
+//
+//        // Mapování pro výběr kategorie
+//        $catMap = [
+//            'Základní koberce' => null,
+//            'Speciální koberce' => null,
+//            'Koberce na míru' => null,
+//        ];
+//
+//        foreach ($categories as $cat) {
+//            if ($cat->title === 'Základní') $catMap['Základní koberce'] = $cat->categoryId;
+//            if ($cat->title === 'Speciální') $catMap['Speciální koberce'] = $cat->categoryId;
+//            if ($cat->title === 'Na míru') $catMap['Koberce na míru'] = $cat->categoryId;
+//        }
+//
+//        $this->template->catMap = $catMap;
 
         // Novinky (produkty)
         $criteria = [
@@ -63,8 +63,8 @@ class HomepagePresenter extends BasePresenter{
     {
         $this->productsFacade = $productsFacade;
     }
-    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade): void
-    {
-        $this->categoriesFacade = $categoriesFacade;
-    }
+//    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade): void
+//    {
+//        $this->categoriesFacade = $categoriesFacade;
+//    }
 }
