@@ -49,17 +49,13 @@
 					</form>
 					{* Admin Toggle *}
                 {if $user->isLoggedIn() && $user->isInRole('admin')}
-{*						<div class="custom-control custom-switch me-3 mr-3 d-none d-md-block">*}
-{*							<input type="checkbox" class="custom-control-input" id="adminToggle" checked onchange="window.location.href={plink :Admin:Homepage:default}">*}
-{*							<label class="custom-control-label small text-muted" for="adminToggle">Admin režim</label>*}
-{*						</div>*}
 					{var $isAdminModule = strpos($presenter->getName(), 'Admin:') === 0}
 					<div class="custom-control custom-switch mr-3 d-none d-md-block">
 						<input type="checkbox"
 							   class="custom-control-input"
 							   id="adminToggle"
 								n:attr="checked => $isAdminModule"
-							   onchange="location.href = this.checked ? {plink :Admin:Homepage:default} :{plink :Front:Homepage:default}">
+							   onchange="location.href = this.checked ? {plink :Admin:Dashboard:default} :{plink :Front:Homepage:default}">
 						<label class="custom-control-label small text-muted" for="adminToggle">Admin režim</label>
 					</div>
 				{/if}
