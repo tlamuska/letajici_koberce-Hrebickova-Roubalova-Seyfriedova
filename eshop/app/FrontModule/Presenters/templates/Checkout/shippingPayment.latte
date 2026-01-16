@@ -1,0 +1,160 @@
+{block content}
+
+{include _steps.latte, current => 'shippingPayment', maxStep => $maxStep}
+
+<h1>Doprava a platba</h1>
+<p class="text-muted">Položek v košíku: {$cart->getTotalCount()}</p>
+
+{var $itemsTotal = (float) $cart->getTotalPrice()}
+
+{form checkoutForm}
+    <div class="row mt-4">
+
+        <div class="col-lg-5">
+            <h4>Doprava</h4>
+            <div class="mb-3">
+                {label shippingMethod /}
+            {input shippingMethod class => 'form-control'}
+                <div class="text-danger small">{inputError shippingMethod}</div>
+            </div>
+
+            <h4 class="mt-4">Platba</h4>
+            <div class="mb-3">
+                {label paymentMethod /}
+            {input paymentMethod class => 'form-control'}
+                <div class="text-danger small">{inputError paymentMethod}</div>
+            </div>
+
+            <div class="mt-3 pt-3"></div>
+            {* SOUHRN CEN *}
+            <div class="card bg-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span>Cena zboží</span>
+                        <strong id="sum-items" data-items-total="{$itemsTotal}">
+                            {$itemsTotal|number:0:',':' '} Kč
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <span>Doprava</span>
+                        <strong id="sum-shipping">—</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <span>Platba</span>
+                        <strong id="sum-payment">—</strong>
+                    </div>
+
+                    <hr class="my-2">
+
+                    <div class="d-flex justify-content-between">
+                        <span>Celkem</span>
+                        <strong id="sum-total">{$itemsTotal|number:0:',':' '} Kč</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <h4>Kontaktní údaje</h4>
+
+            <div class="mb-3">
+                {label customerName /}
+            {input customerName class => 'form-control'}
+                <div class="text-danger small">{inputError customerName}</div>
+            </div>
+
+            <div class="mb-3">
+                {label customerEmail /}
+            {input customerEmail class => 'form-control'}
+                <div class="text-danger small">{inputError customerEmail}</div>
+            </div>
+
+            <div class="mb-3">
+                {label phone /}
+            {input phone class => 'form-control'}
+                <div class="text-danger small">{inputError phone}</div>
+            </div>
+
+            <div class="mb-3">
+                {label deliveryAddress /}
+            {input deliveryAddress class => 'form-control'}
+                <div class="text-danger small">{inputError deliveryAddress}</div>
+            </div>
+
+            <div class="mb-3">
+                {label note /}
+            {input note class => 'form-control', rows => 4}
+                <div class="text-danger small">{inputError note}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-between align-items-stretch align-items-sm-center mt-4">
+        <a class="btn btn-outline-secondary mb-2 mb-sm-0" href="{plink :Front:Cart:default}">← Zpět do košíku</a>
+        {input ok class => 'btn btn-primary'}
+    </div>
+{/form}
+
+<script>
+    (function () {
+        var itemsEl = document.getElementById('sum-items');
+        var itemsTotal = Number(itemsEl?.dataset?.itemsTotal || 0);
+
+        var shippingSelect = document.querySelector('select[name="shippingMethod"]');
+        var paymentSelect  = document.querySelector('select[name="paymentMethod"]');
+
+        var sumShipping = document.getElementById('sum-shipping');
+        var sumPayment  = document.getElementById('sum-payment');
+        var sumTotal    = document.getElementById('sum-total');
+
+        function parsePriceFromText(text) {
+            // vezme číslo z "(90 Kč)" nebo "(9 999 Kč)"
+            var m = String(text).match(/\(([\d\s]+)\s*Kč\)/i);
+            if (!m) return 0; // když není cena, beru jako 0 (ne null)
+            return Number(m[1].replace(/\s+/g, '')) || 0;
+        }
+
+        function formatCzK(n) {
+            try {
+                return new Intl.NumberFormat('cs-CZ').format(n) + ' Kč';
+            } catch (e) {
+                return n + ' Kč';
+            }
+        }
+
+        function getSelectedText(selectEl) {
+            if (!selectEl || !selectEl.value) return '—';
+            var opt = selectEl.options[selectEl.selectedIndex];
+            return opt ? opt.text : '—';
+        }
+
+        function getSelectedPrice(selectEl) {
+            if (!selectEl || !selectEl.value) return 0;
+            var opt = selectEl.options[selectEl.selectedIndex];
+            return opt ? parsePriceFromText(opt.text) : 0;
+        }
+
+        function refresh() {
+            var shippingText = getSelectedText(shippingSelect);
+            var paymentText  = getSelectedText(paymentSelect);
+
+            var shippingPrice = getSelectedPrice(shippingSelect);
+            var paymentPrice  = getSelectedPrice(paymentSelect);
+
+            if (sumShipping) sumShipping.textContent = shippingText;
+            if (sumPayment)  sumPayment.textContent  = paymentText;
+            if (sumTotal)    sumTotal.textContent    = formatCzK(itemsTotal + shippingPrice + paymentPrice);
+        }
+
+        // počáteční stav
+        if (sumTotal) sumTotal.textContent = formatCzK(itemsTotal);
+
+        if (shippingSelect) shippingSelect.addEventListener('change', refresh);
+        if (paymentSelect)  paymentSelect.addEventListener('change', refresh);
+
+        refresh();
+    })();
+</script>

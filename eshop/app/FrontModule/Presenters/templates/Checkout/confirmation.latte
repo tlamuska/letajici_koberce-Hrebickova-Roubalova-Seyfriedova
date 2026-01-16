@@ -1,0 +1,30 @@
+{block content}
+
+{include _steps.latte, current => 'confirmation', maxStep => $maxStep}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <div class="display-4 mb-3">✅</div>
+
+                    <h1 class="h3 mb-2">Objednávka odeslána</h1>
+                    <p class="h5 text-muted mb-4">
+                        Děkujeme! Číslo objednávky:
+                        <span class="badge badge-light text-dark ml-2">{$orderId}</span>
+                    </p>
+
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-primary mr-2" href="{plink :Front:Product:list}">Pokračovat v nákupu</a>
+                        <a class="btn btn-outline-secondary" href="{plink :Front:Cart:default}">Košík</a>
+                    </div>
+
+                    <p class="text-muted mt-4 mb-0">
+                        Stav objednávky můžete sledovat v administraci. Při platbě převodem ji admin označí jako zaplacenou.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

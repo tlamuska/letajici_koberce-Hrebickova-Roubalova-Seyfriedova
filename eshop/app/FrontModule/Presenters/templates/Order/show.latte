@@ -41,8 +41,8 @@
                     {/if}
                 </div>
 
-                <div class="mt-3"><b>Způsob platby:</b> {$order->paymentMethod}</div>
-                <div><b>Způsob dopravy:</b> {$order->shippingMethod} ({$order->shippingPrice} Kč)</div>
+                <div class="mt-3"><b>Způsob platby:</b> {$order->paymentLabel}</div>
+                <div><b>Způsob dopravy:</b> {$order->shippingLabel} ({$order->shippingPrice} Kč)</div>
 
                 <div class="mt-4 p-3 bg-light rounded">
                     <div class="d-flex justify-content-between">
@@ -59,12 +59,50 @@
     </div>
 </div>
 
-<h3 class="mt-4">Objednané koberce</h3>
-<div class="table-responsive">
-    <table class="table table-hover mt-2">
+<h3 class="mt-4">Objednané zboží</h3>
+
+{* MOBIL: pod sebou *}
+<div class="d-sm-none">
+    {foreach $items as $item}
+        <div class="border rounded-3 p-3 mb-2">
+            <div class="fw-bold mb-2">{$item->productTitle}</div>
+
+            <div class="d-flex justify-content-between">
+                <span class="text-secondary">Barva</span>
+                <span>{$colors[$item->color] ?? '–'}</span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <span class="text-secondary">Velikost</span>
+                <span>{if $item->size !== null && $item->size !== ''}{$item->size} cm{else}–{/if}</span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <span class="text-secondary">Cena/ks</span>
+                <span class="text-nowrap">{$item->unitPrice} Kč</span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <span class="text-secondary">Množství</span>
+                <span class="text-nowrap">{$item->count}×</span>
+            </div>
+
+            <hr class="my-2">
+
+            <div class="d-flex justify-content-between fw-bold">
+                <span>Celkem</span>
+                <span class="text-nowrap">{$item->lineTotal} Kč</span>
+            </div>
+        </div>
+    {/foreach}
+</div>
+
+{* DESKTOP: tabulka *}
+<div class="d-none d-sm-block">
+    <table class="table table-hover mt-2 align-middle">
         <thead class="table-light">
         <tr>
-            <th>Název produktu</th>
+            <th>Produkt</th>
             <th>Barva</th>
             <th>Velikost</th>
             <th class="text-end">Cena/ks</th>
@@ -76,16 +114,17 @@
         {foreach $items as $item}
             <tr>
                 <td class="fw-bold">{$item->productTitle}</td>
-                <td>{$item->color ?: '-'}</td>
-                <td>{$item->size ?: '-'}</td>
-                <td class="text-end">{$item->unitPrice} Kč</td>
-                <td class="text-end">{$item->count}x</td>
-                <td class="text-end fw-bold">{$item->lineTotal} Kč</td>
+                <td>{$colors[$item->color] ?? '–'}</td>
+                <td>{if $item->size !== null && $item->size !== ''}{$item->size} cm{else}–{/if}</td>
+                <td class="text-end text-nowrap">{$item->unitPrice} Kč</td>
+                <td class="text-end text-nowrap">{$item->count}×</td>
+                <td class="text-end fw-bold text-nowrap">{$item->lineTotal} Kč</td>
             </tr>
         {/foreach}
         </tbody>
     </table>
 </div>
+
 
 <div class="mt-4 mb-5">
     <a n:href="default" class="btn btn-outline-secondary">← Zpět na mé objednávky</a>
