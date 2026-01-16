@@ -20,6 +20,16 @@ class OrderPresenter extends BasePresenter
         }
     }
 
+    protected function beforeRender(): void
+    {
+        parent::beforeRender();
+        $this->template->colors = [
+            'red' => 'Červená',
+            'blue' => 'Modrá',
+            'green' => 'Zelená',
+        ];
+    }
+
     /**
      * @throws \Exception
      */
