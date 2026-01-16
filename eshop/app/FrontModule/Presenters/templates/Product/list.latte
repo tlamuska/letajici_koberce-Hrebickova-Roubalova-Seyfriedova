@@ -10,13 +10,14 @@
         <div class="list-group">
             <h4 class="mb-3">Kategorie</h4>
 
-            <a n:href="list category => null" class="list-group-item list-group-item-action {if !$currentCategory}active{/if}">
-                Všechny produkty
+            <a n:href="Product:list categoryText => null"
+                    class="list-group-item list-group-item-action {if !$currentCategory}active{/if}">
+                    Všechny produkty
             </a>
 
             {foreach $categories as $cat}
-                {* Předpokládám, že kategorie má vlastnost categoryId a title *}
-                <a n:href="list category => $cat->categoryId" class="list-group-item list-group-item-action {if $currentCategory && $currentCategory->categoryId == $cat->categoryId}active{/if}">
+                <a n:href="Product:list categoryText => Nette\Utils\Strings::webalize($cat->title)"
+                        class="list-group-item list-group-item-action {if $currentCategory && $currentCategory->categoryId == $cat->categoryId}active{/if}">
                     {$cat->title}
                 </a>
             {/foreach}
@@ -63,10 +64,20 @@
                                         {$product->title}
                                     </a>
                                 </h5>
-
+                                <p class="card-text text-center text-primary fw-bold">
+                                    {$product->price|number:0, ',', ' '} Kč
+                                </p>
                                 <div class="mt-auto pt-2">
-                                    {control productCartForm-$product->productId}
+                                    <a href="{plink Product:show url=>$product->url}" class="btn btn-primary w-100">
+                                        Zobrazit produkt
+                                    </a>
                                 </div>
+
+
+
+    {*                                <div class="mt-auto pt-2">*}
+    {*                                    {control productCartForm-$product->productId}*}
+    {*                                </div>*}
                             </div>
                         </div>
                     </div>

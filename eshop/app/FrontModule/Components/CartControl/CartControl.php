@@ -41,15 +41,19 @@ class CartControl extends Control{
     /**
      * Metoda pro přidání produktu do košíku
      * @param Product $product
+     * @property string|null $color
      */
-    public function addToCart(Product $product, int $count=1):void {
+    public function addToCart(Product $product, int $count=1,array $options = [] ):void {
         $cartItem=null;
+
+        $requestedColor = $options['color'] ?? 'red';
+        $requestedSize = $options['size'] ?? '90x170';
 
         $this->cart->updateCartItems();
 
         if ($this->cart->items) {
             foreach ($this->cart->items as $item) {
-                if ($item->product->productId==$product->productId){
+                if ($item->product->productId==$product->productId && $item->color === $requestedColor && $item->size === $requestedSize){
                     $cartItem=$item;
                     break;
                 }
@@ -60,6 +64,8 @@ class CartControl extends Control{
             $cartItem=new CartItem();
             $cartItem->cart=$this->cart;
             $cartItem->product=$product;
+            $cartItem->color = $requestedColor;
+            $cartItem->size = $requestedSize;
         }
 
         $cartItem->count+=$count;
