@@ -10,6 +10,7 @@ use App\Model\Facades\CartFacade;
 use App\Model\Facades\CategoriesFacade;
 use Nette\Application\AbortException;
 use Nette\Application\ForbiddenRequestException;
+use Nette\Utils\Strings;
 
 /**
  * Class BasePresenter
@@ -33,13 +34,16 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter {
 
         $catMap = [];
         foreach ($categories as $cat) {
-            // klíče pro menu v layoutu (krátké)
-            $catMap[$cat->title] = $cat->categoryId;
+            // slug z názvu (např. 'Základní' -> 'zakladni')
+            $slug = Strings::webalize($cat->title);
 
-            // klíče pro dlaždice na Homepage (dlouhé) podle původní logiky
-            if ($cat->title === 'Základní') $catMap['Základní koberce'] = $cat->categoryId;
-            if ($cat->title === 'Speciální') $catMap['Speciální koberce'] = $cat->categoryId;
-            if ($cat->title === 'Na míru') $catMap['Koberce na míru'] = $cat->categoryId;
+            // klíčem je název, hodnotou je slug (pro hezká URL)
+            $catMap[$cat->title] = $slug;
+
+            // Podpora pro dlaždice na Homepage
+            if ($cat->title === 'Základní') $catMap['Základní koberce'] = $slug;
+            if ($cat->title === 'Speciální') $catMap['Speciální koberce'] = $slug;
+            if ($cat->title === 'Na míru') $catMap['Koberce na míru'] = $slug;
         }
 
         $this->template->catMap = $catMap;

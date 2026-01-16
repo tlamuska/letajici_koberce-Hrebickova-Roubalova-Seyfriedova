@@ -31,11 +31,11 @@
             {* menu uprostřed *}
             <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-4">
 				<nav class="nav">
-					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list category => ($catMap['Základní'] ?? null)">Základní</a>
-					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list category => ($catMap['Speciální'] ?? null)">Speciální</a>
-					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list category => ($catMap['Na míru'] ?? null)">Na míru</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list categoryText => ($catMap['Základní'] ?? null)">Základní</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list categoryText => ($catMap['Speciální'] ?? null)">Speciální</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list categoryText => ($catMap['Na míru'] ?? null)">Na míru</a>
 {*					<a class="nav-link text-dark font-weight-bold" href="#">Příslušenství</a>*}
-					<a class="nav-link text-dark font-weight-bold" href="#">Návody</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Tutorial:default">Návody</a>
 				</nav>
 
 
@@ -99,24 +99,6 @@
 	</div>
 </header>
 
-{*	<header class="navbar navbar-light bg-light mb-4">*}
-{*		<div class="container">*}
-{*			<h1 class="h2 mt-1 "><a href="{plink Homepage:default}" class="text-dark">E-shop</a></h1>*}
-{*			<div class="ml-auto">*}
-{*				{control cart}*}
-{*				{control userLogin}*}
-{*			</div>*}
-{*		</div>*}
-{*	</header>*}
-	<div class="container">
-
-		<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type=='error'?'danger':$flash->type} alert-dismissible mt-2" role="alert">
-			{$flash->message}
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-
 		<div class="container">
 
 			<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type=='error'?'danger':$flash->type} alert-dismissible mt-2" role="alert">
@@ -133,18 +115,24 @@
 					{ifset $product}
 						{if $product->category}
 							<li class="breadcrumb-item">
+								<a n:href="Product:list q => null, categoryText => null, category => null">Produkty</a>
+							</li>
+							<li class="breadcrumb-item">
 								<a n:href="Product:list categoryText => Nette\Utils\Strings::webalize($product->category->title), category => null">
 									{$product->category->title}
 								</a>
 							</li>
 						{else}
 							<li class="breadcrumb-item">
-								<a n:href="Product:list">Všechny produkty</a>
+								<a n:href="Product:list categoryText => null, category => null">Všechny produkty</a>
 							</li>
 						{/if}
 						<li class="breadcrumb-item active" aria-current="page">{$product->title}</li>
 
 					{elseifset $currentCategory}
+						<li class="breadcrumb-item">
+							<a n:href="Product:list q => null, categoryText => null, category => null">Produkty</a>
+						</li>
 						<li class="breadcrumb-item active" aria-current="page">{$currentCategory->title}</li>
 
 					{elseif $presenter->isLinkCurrent('Product:list')}

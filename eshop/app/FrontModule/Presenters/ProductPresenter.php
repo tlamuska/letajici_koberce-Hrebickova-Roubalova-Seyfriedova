@@ -23,7 +23,6 @@ class ProductPresenter extends BasePresenter{
     public $category = null;
     /** @persistent */
     public $q = null; // parametr pro vyhledávání
-    private CategoriesFacade $categoriesFacade;
 
     /** @persistent */
     public $categoryText = null;
