@@ -1,0 +1,54 @@
+{block content}
+
+{include _steps.latte, current => 'recapitulation', maxStep => $maxStep}
+
+<h1>Rekapitulace objednávky</h1>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Produkt</th>
+        <th>Barva</th>
+        <th>Velikost</th>
+        <th class="d-none d-md-table-cell">Cena/ks</th>
+        <th>Ks</th>
+        <th class="d-none d-md-table-cell">Cena</th>
+    </tr>
+    </thead>
+    <tbody>
+    {foreach $cart->items as $item}
+        <tr>
+            <td>{$item->product->title}</td>
+            <td>{$colors[$item->color] ?? '-'}</td>
+            <td>{if $item->size !== null && $item->size !== ''}{$item->size} cm{else}–{/if}</td>
+            <td class="d-none d-md-table-cell">{$item->product->price|number:0:',':' '} Kč</td>
+            <td>{$item->count}</td>
+            <td class="d-none d-md-table-cell">{($item->product->price * $item->count)|number:0:',':' '} Kč</td>
+        </tr>
+    {/foreach}
+    </tbody>
+</table>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h5>Zákazník</h5>
+        <div><b>Jméno:</b> {$data['customerName']}</div>
+        <div><b>E-mail:</b> {$data['customerEmail']}</div>
+        <div n:if="$data['phone']"><b>Telefon:</b> {$data['phone']}</div>
+        <div n:if="$data['deliveryAddress']"><b>Adresa:</b> {$data['deliveryAddress']}</div>
+        <div n:if="$data['note']"><b>Poznámka:</b> {$data['note']}</div>
+    </div>
+
+    <div class="col-md-6 text-end">
+        <h5>Souhrn</h5>
+        <div><b>Doprava:</b> {$shippingLabel} ({$shippingPrice|number:0:',':' '} Kč)</div>
+        <div><b>Platba:</b> {$paymentLabel}</div>
+        <hr>
+        <div><b>Položky:</b> {$itemsTotal|number:0:',':' '} Kč</div>
+        <div class="fs-5"><b>Celkem:</b> {$grandTotal|number:0:',':' '} Kč</div>
+    </div>
+</div>
+<div class="d-flex flex-column flex-sm-row gap-2 justify-content-between mt-4">
+    <a class="btn btn-outline-secondary mb-2 mb-sm-0" href="{plink shippingPayment}">← Zpět na výběr platby a dopravy</a>
+    <a class="btn btn-success" n:href="sendOrder!">Odeslat objednávku</a>
+</div>

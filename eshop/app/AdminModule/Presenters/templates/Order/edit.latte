@@ -29,8 +29,8 @@
                     <span>{$order->statusLabel}</span>
                 </div>
 
-                <div class="mt-2"><b>Platba:</b> {$order->paymentMethod}</div>
-                <div><b>Doprava:</b> {$order->shippingMethod} ({$order->shippingPrice} Kč)</div>
+                <div class="mt-2"><b>Platba:</b> {$order->paymentLabel}</div>
+                <div><b>Doprava:</b> {$order->shippingLabel} ({$order->shippingPrice} Kč)</div>
 
                 <hr>
                 <div><b>Mezisoučet:</b> {$order->itemsTotal} Kč</div>

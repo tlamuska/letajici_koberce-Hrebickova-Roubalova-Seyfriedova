@@ -79,6 +79,8 @@ class ProductPresenter extends BasePresenter{
 
                 if ($product->category && $product->category->title === "Na míru" ) {
                     $size = $values->size;
+                } elseif ($product->type === "Prislusenstvi") {
+                    $size = null;
                 } else {
                     $size = '90x170';
                 }
@@ -106,7 +108,6 @@ class ProductPresenter extends BasePresenter{
      * Akce pro vykreslení přehledu produktů
      */
     public function renderList():void {
-        //TODO tady by mělo přibýt filtrování podle kategorie, stránkování atp.
         $criteria = [
             'available' => true,
             'order' => 'title',

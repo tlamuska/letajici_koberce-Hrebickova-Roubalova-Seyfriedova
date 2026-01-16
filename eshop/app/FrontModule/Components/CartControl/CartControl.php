@@ -35,6 +35,11 @@ class CartControl extends Control{
     public function renderList():void {
         $template=$this->prepareTemplate('list');
         $template->cart=$this->cart;
+        $template->colors = [
+            'red' => 'Červená',
+            'blue' => 'Modrá',
+            'green' => 'Zelená',
+        ];
         $template->render();
     }
 
@@ -46,8 +51,8 @@ class CartControl extends Control{
     public function addToCart(Product $product, int $count=1,array $options = [] ):void {
         $cartItem=null;
 
-        $requestedColor = $options['color'] ?? 'red';
-        $requestedSize = $options['size'] ?? '90x170';
+        $requestedColor = $options['color'] ?? null;
+        $requestedSize = $options['size'] ?? null;
 
         $this->cart->updateCartItems();
 
@@ -72,13 +77,12 @@ class CartControl extends Control{
         if ($cartItem->count>0) {
             $this->cartFacade->saveCartItem($cartItem);
         } else {
-            $this->cartFacade->deleteCartItem($cartItem); //TODO přidat deleteCartItem
+            $this->cartFacade->deleteCartItem($cartItem);
         }
 
         $this->cartFacade->saveCartItem($cartItem);
         $this->cartFacade->saveCart($this->cart);
         $this->cart->updateCartItems();
-        //TODO implementovat
     }
 
 
@@ -87,6 +91,37 @@ class CartControl extends Control{
 
         $cartItem = $this->cartFacade->getCartItem($cartItemId);
         $this->cartFacade->deleteCartItem($cartItem);
+
+        $this->presenter->redirect('this');
+    }
+
+    /**
+     * Metoda pro updatování košíku při změně počtu
+     * @param int $cartItemId
+     * @param int $delta
+     * @return void
+     */
+    public function handleChangeCount(int $cartItemId, int $delta): void {
+        $this->cart->updateCartItems();
+
+        $cartItem = $this->cartFacade->getCartItem($cartItemId);
+
+        // ověření že položka patří do aktuálního košíku
+        if (!$cartItem || $cartItem->cart->cartId !== $this->cart->cartId) {
+            $this->presenter->redirect('this');
+        }
+
+        $newCount = $cartItem->count + $delta;
+
+        if ($newCount <= 0) {
+            $this->cartFacade->deleteCartItem($cartItem);
+        } else {
+            $cartItem->count = $newCount;
+            $this->cartFacade->saveCartItem($cartItem);
+        }
+
+        $this->cartFacade->saveCart($this->cart);
+        $this->cart->updateCartItems();
 
         $this->presenter->redirect('this');
     }

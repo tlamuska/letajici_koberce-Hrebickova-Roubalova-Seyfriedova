@@ -14,8 +14,8 @@ use LeanMapper\Entity;
  * @property string $productTitle
  * @property float $unitPrice
  * @property int $count
- * @property string $color
- * @property string $size
+ * @property string|null $color
+ * @property string|null $size
  * @property float $lineTotal
  */
 
