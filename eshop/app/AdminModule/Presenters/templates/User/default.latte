@@ -1,86 +1,92 @@
 {varType App\Model\Entities\User[] $users}
 {varType Nette\Utils\Paginator $paginator}
+{varType string|null $search}
+
 {block content}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 n:block="title">Správa uživatelů</h1>
 
-        <div class="d-flex gap-2">
-            {* Vyhledávací formulář *}
-            <form n:name="searchForm" class="form-inline mr-2">
-                <div class="input-group">
-                    <input n:name="query" class="form-control form-control-sm">
-                    <div class="input-group-append">
-                        <button n:name="send" class="btn btn-sm btn-outline-secondary">
-                            <i class="fa fa-search"></i>
-                        </button>
+        <div class="d-flex align-items-center">
+            {* Vyhledávání *}
+            <form n:name="searchForm" class="form-inline mr-3">
+                    <div class="input-group">
+                        <input n:name="query" class="form-control form-control-sm" placeholder="hledat...">
+                        <div class="input-group-append">
+                            <button n:name="send" class="btn btn-sm btn-outline-secondary">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                {* Tlačítko pro zrušení hledání, pokud se hledá *}
-                <a n:if="$search" n:href="this, search => null" class="btn btn-sm btn-link text-danger">Zrušit hledání</a>
             </form>
 
-            <a n:href="add" class="btn btn-success">
-                <i class="fa fa-plus"></i> Nový uživatel
+            {* ZELENÝ OBRYS pro nové uživatele *}
+            <a n:href="add" class="btn btn-sm btn-outline-success font-weight-bold text-lowercase">
+                nový uživatel
             </a>
         </div>
     </div>
 
-{if count($users) > 0}
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Jméno</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Akce</th>
-        </tr>
-        </thead>
-        <tbody>
-        {foreach $users as $u}
+    {if count($users) > 0}
+        <table class="table table-hover mt-4">
+            <thead>
             <tr>
-                <td>{$u->userId}</td> {* V LeanMapperu se mapuje na user_id v DB *}
-                <td>{$u->name}</td>
-                <td>{$u->email}</td>
-                <td>
-                    {if $u->role}
-                        {$u->role->roleId}
-                    {else}
-                        - bez role -
-                    {/if}
-                </td>
-                <td>
-                    <a n:href="edit $u->userId"
-                            class="btn btn-sm btn-primary">
-                        <i class="fa fa-pencil"></i> Upravit</a>
-                    <a n:href="delete! $u->userId"
-                            class="btn btn-sm btn-danger"
-                            onclick="return confirm('Opravdu chcete smazat uživatele {$u->name}?')">
-                        <i class="fa fa-trash"></i> Smazat
-                    </a>
-                </td>
+                <th>Id</th>
+                <th>Jméno</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="text-right">Akce</th>
             </tr>
-        {/foreach}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {foreach $users as $u}
+                <tr>
+                    <td>{$u->userId}</td>
+                    <td>{$u->name}</td>
+                    <td>{$u->email}</td>
+                    <td>
+                    <span class="badge badge-light border text-lowercase">
+                        {if $u->role}{$u->role->roleId}{else}host{/if}
+                    </span>
+                    </td>
+                    <td class="text-nowrap text-right">
+                        {* MODRÝ OBRYS pro upravit *}
+                    <a href="{link edit id=>$u->userId}" class="btn btn-sm btn-outline-primary text-lowercase">upravit</a>
 
-    <div n:if="$paginator->pageCount > 1" class="pagination-wrapper d-flex justify-content-center mt-4">
-        <ul class="pagination">
-            <li n:class="page-item, $paginator->isFirst() ? disabled">
-                <a n:href="this, page => $paginator->getPage() - 1" class="page-link">Předchozí</a>
-            </li>
+                    {* ČERVENÝ OBRYS pro smazat *}
+                        <a href="{link delete! id=>$u->userId}"
+                           class="btn btn-sm btn-outline-danger text-lowercase ml-1"
+                           onclick="return confirm('Opravdu chcete smazat uživatele {$u->name}?')">smazat</a>
+                    </td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
 
-            <li n:for="$i = $paginator->getFirstPage(); $i <= $paginator->getLastPage(); $i++"
-        n:class="page-item, $i == $paginator->getPage() ? active">
-                <a n:href="this, page => $i" class="page-link">{$i}</a>
-            </li>
+        {* Paginátor - také jen obrysy *}
+        <div n:if="$paginator->pageCount > 1" class="d-flex justify-content-center mt-4">
+            <ul class="pagination pagination-sm">
+                <li n:class="page-item, $paginator->isFirst() ? disabled">
+                    <a n:href="this, page => $paginator->getPage() - 1" class="page-link border-primary text-primary">předchozí</a>
+                </li>
+                <li n:for="$i = $paginator->getFirstPage(); $i <= $paginator->getLastPage(); $i++"
+                n:class="page-item, $i == $paginator->getPage() ? active">
+                    <a n:href="this, page => $i"
+                   n:class="page-link, $i == $paginator->getPage() ? 'bg-white border-primary text-primary font-weight-bold' : 'text-primary'">
+                        {$i}
+                    </a>
+                </li>
+                <li n:class="page-item, $paginator->isLast() ? disabled">
+                    <a n:href="this, page => $paginator->getPage() + 1" class="page-link border-primary text-primary">další</a>
+                </li>
+            </ul>
+        </div>
+    {/if}
 
-            <li n:class="page-item, $paginator->isLast() ? disabled">
-                <a n:href="this, page => $paginator->getPage() + 1" class="page-link">Další</a>
-            </li>
-        </ul>
-    </div>
-{else}
-    <div class="alert alert-info">Nebyli nalezeni žádní uživatelé odpovídající dotazu "{$search}".</div>
-{/if}
+    <style>
+        /* Vynucení čistého stylu u paginátoru, aby aktivní stránka neměla modrou výplň */
+        .page-item.active .page-link {
+            background-color: #fff !important;
+            border-width: 2px;
+        }
+    </style>
 {/block}

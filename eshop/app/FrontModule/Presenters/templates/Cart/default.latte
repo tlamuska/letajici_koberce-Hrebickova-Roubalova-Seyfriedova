@@ -1,3 +1,7 @@
 {block content}
-    <h1>Košík</h1>
-    {control cart:list}
+
+{include ../Checkout/_steps.latte, current => 'cart', maxStep => $checkoutMaxStep, orderId => null}
+
+<h1>Košík</h1>
+{control cart:list}
+

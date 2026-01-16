@@ -7,9 +7,9 @@
     <table class="table table-hover mt-4">
         <thead>
         <tr>
-            <th scope="col">Datum:</th>
-            <th scope="col">Číslo objednávky</th>
-            <th scope="col">Celková cena</th>
+            <th class="d-none d-md-table-cell" scope="col">Datum</th>
+            <th class="d-none d-md-table-cell" scope="col">Číslo objednávky</th>
+            <th scope="col">Cena</th>
             <th scope="col">Stav</th>
             <th scope="col">Akce</th>
         </tr>
@@ -17,12 +17,12 @@
         <tbody>
         {foreach $orders as $order}
             <tr>
-                <td>{$order->createdAt|date:'j.n.Y H:i'}</td>
-                <td>#{$order->orderId}</td>
+                <td class="d-none d-md-table-cell">{$order->createdAt|date:'j.n.Y H:i'}</td>
+                <td class="d-none d-md-table-cell">#{$order->orderId}</td>
                 <td>{$order->grandTotal} Kč</td>
                 <td><span class="badge badge-info">{$order->statusLabel}</span></td>
                 <td>
-                    <a n:href="show id=>$order->orderId" class="btn btn-sm btn-outline-primary">Zobrazit detail</a>
+                    <a n:href="show id=>$order->orderId" class="btn btn-sm btn-outline-primary">Detail</a>
                 </td>
             </tr>
         {/foreach}
