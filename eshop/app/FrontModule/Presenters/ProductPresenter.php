@@ -17,7 +17,7 @@ use Nette\Application\UI\Multiplier;
 class ProductPresenter extends BasePresenter{
     private ProductsFacade $productsFacade;
     private ProductCartFormFactory $productCartFormFactory;
-    private CategoriesFacade $categoriesFacade;
+    //private CategoriesFacade $categoriesFacade;
     /** @persistent */
     public $category = null;
 
@@ -120,8 +120,8 @@ class ProductPresenter extends BasePresenter{
         $this->productCartFormFactory=$productCartFormFactory;
     }
 
-    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade):void {
-        $this->categoriesFacade=$categoriesFacade;
-    }
+//    public function injectCategoriesFacade(CategoriesFacade $categoriesFacade):void {
+//        $this->categoriesFacade=$categoriesFacade;
+//    }
     #endregion injections
 }

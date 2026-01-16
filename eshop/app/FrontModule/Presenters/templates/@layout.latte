@@ -31,12 +31,13 @@
             {* menu uprostřed *}
             <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-4">
 				<nav class="nav">
-					<a class="nav-link text-dark font-weight-bold" href="#">Základní</a>
-					<a class="nav-link text-dark font-weight-bold" href="#">Speciální</a>
-					<a class="nav-link text-dark font-weight-bold" href="#">Na míru</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list category => ($catMap['Základní'] ?? null)">Základní</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list category => ($catMap['Speciální'] ?? null)">Speciální</a>
+					<a class="nav-link text-dark font-weight-bold" n:href=":Front:Product:list category => ($catMap['Na míru'] ?? null)">Na míru</a>
 {*					<a class="nav-link text-dark font-weight-bold" href="#">Příslušenství</a>*}
 					<a class="nav-link text-dark font-weight-bold" href="#">Návody</a>
 				</nav>
+
 
 				{* Vyhledávání *}
 				<form class="ml-auto" style="max-width: 200px;">

@@ -7,6 +7,7 @@ use App\FrontModule\Components\CartControl\CartControlFactory;
 use App\FrontModule\Components\UserLoginControl\UserLoginControl;
 use App\FrontModule\Components\UserLoginControl\UserLoginControlFactory;
 use App\Model\Facades\CartFacade;
+use App\Model\Facades\CategoriesFacade;
 use Nette\Application\AbortException;
 use Nette\Application\ForbiddenRequestException;
 
@@ -18,12 +19,30 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter {
   private UserLoginControlFactory $userLoginControlFactory;
   private CartControlFactory $cartControlFactory;
   private CartFacade $cartFacade;
+    /** @inject */
+    public CategoriesFacade $categoriesFacade;
 
     protected function beforeRender(): void // metoda se spustí před vykreslením každé šablony
     {
         parent::beforeRender();
         // přidání proměnné do všech šablon
         $this->template->cartItemCount = $this['cart']->getTotalCount();
+
+        $categories = $this->categoriesFacade->findAllCategories();
+        $this->template->categories = $categories;
+
+        $catMap = [];
+        foreach ($categories as $cat) {
+            // klíče pro menu v layoutu (krátké)
+            $catMap[$cat->title] = $cat->categoryId;
+
+            // klíče pro dlaždice na Homepage (dlouhé) podle původní logiky
+            if ($cat->title === 'Základní') $catMap['Základní koberce'] = $cat->categoryId;
+            if ($cat->title === 'Speciální') $catMap['Speciální koberce'] = $cat->categoryId;
+            if ($cat->title === 'Na míru') $catMap['Koberce na míru'] = $cat->categoryId;
+        }
+
+        $this->template->catMap = $catMap;
     }
 
   /**
