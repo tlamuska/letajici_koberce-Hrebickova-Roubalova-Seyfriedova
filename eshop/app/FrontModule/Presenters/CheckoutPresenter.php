@@ -207,45 +207,39 @@
                 $orderUrl = $this->link('//:Front:Order:show', ['id' => $order->orderId]);
 
                 $htmlBody = "
-                            <p>Vážený zákazníku,</p>
-                            <p>Vaše objednávka č. <strong>{$order->orderId}</strong> byla přijata a předána ke zpracování.</p>
-                            <table style='width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;'>
-                                <thead>
-                                    <tr style='background-color: #f2f2f2;'>
-                                        <th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>Produkt</th>
-                                        <th style='padding: 8px; border: 1px solid #ddd;'>Barva</th>
-                                        <th style='padding: 8px; border: 1px solid #ddd;'>Velikost</th>
-                                        <th style='padding: 8px; border: 1px solid #ddd;'>Ks</th>
-                                        <th style='padding: 8px; border: 1px solid #ddd;'>Cena</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {$itemsHtml}
-               
-                                </tbody>
-                                <tfoot>
-                <tr>
-                    <td colspan='5' style='padding: 8px; border: 1px solid #ddd; text-align: right;'>Způsob dopravy: <strong>{$shippingLabel}</strong></td>
-                    <td style='padding: 8px; border: 1px solid #ddd; text-align: right;'>" . number_format($order->shippingPrice ?? 0, 0, ',', ' ') . " Kč</td>
-                </tr>
-                <tr>
-                    <td colspan='5' style='padding: 8px; border: 1px solid #ddd; text-align: right;'>Způsob platby: <strong>{$paymentLabel}</strong></td>
-                    <td style='padding: 8px; border: 1px solid #ddd; text-align: right;'>0 Kč</td>
-                </tr>   
-                <tr style='background-color: #f8f9fa; font-weight: bold;'>
-                    <td colspan='5' style='padding: 10px; border: 1px solid #ddd; text-align: right; font-size: 1.1em;'>Celkem k úhradě:</td>
-                    <td style='padding: 10px; border: 1px solid #ddd; text-align: right; font-size: 1.1em;'>{$order->grandTotal} Kč</td>
-                </tr>
-            </tfoot>
-            </table>
-    <p style='font-family: Arial, sans-serif; color: #333;'>Vaši objednávku můžete sledovat zde:
-    <a href='{$orderUrl}' >Detail objednávky č. {$order->orderId}</a></p>  
-                            <p>Děkujeme za nákup!<br>
-                               S pozdravem <br>
-                               Létající koberce
-                            
-                            </p>
-            ";
+                <p>Vážený zákazníku,</p>
+                <p>potvrzujeme, že jsme přijali platbu pro Vaši objednávku č. <strong>{$order->orderId}</strong>.</p>
+                <table style='width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;'>
+                    <thead>
+                        <tr style='background-color: #f2f2f2;'>
+                            <th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>Produkt</th>
+                            <th style='padding: 8px; border: 1px solid #ddd;'>Barva</th>
+                            <th style='padding: 8px; border: 1px solid #ddd;'>Velikost</th>
+                            <th style='padding: 8px; border: 1px solid #ddd;'>Ks</th>
+                            <th style='padding: 8px; border: 1px solid #ddd;'>Cena</th>
+                        </tr>
+                    </thead>
+                    <tbody>{$itemsHtml}</tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan='4' style='padding: 8px; border: 1px solid #ddd; text-align: right;'>Doprava: <strong>{$shippingLabel}</strong></td>
+                            <td style='padding: 8px; border: 1px solid #ddd; text-align: right;'>" . number_format($order->shippingPrice ?? 0, 0, ',', ' ') . " Kč</td>
+                        </tr>
+                        <tr>
+                            <td colspan='4' style='padding: 8px; border: 1px solid #ddd; text-align: right;'>Platba: <strong>{$paymentLabel}</strong></td>
+                            <td style='padding: 8px; border: 1px solid #ddd; text-align: right;'>0 Kč</td>
+                        </tr>   
+                        <tr style='background-color: #f8f9fa; font-weight: bold;'>
+                            <td colspan='4' style='padding: 10px; border: 1px solid #ddd; text-align: right; font-size: 1.1em;'>Celkem zaplaceno:</td>
+                            <td style='padding: 10px; border: 1px solid #ddd; text-align: right; font-size: 1.1em;'>" . number_format($order->grandTotal, 0, ',', ' ') . " Kč</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <p>O dalším průběhu Vás budeme informovat.</p>
+                <p>Vaši objednávku můžete sledovat zde: <a href='{$orderUrl}'>Detail objednávky č. {$order->orderId}</a></p>
+                <p>Děkujeme za nákup!<br>S pozdravem <br>Létající koberce</p>";
+
+                // poslat mail
                 $mail = new \Nette\Mail\Message();
                 $mail->setFrom('info@letajicikoberce.cz', 'Létající koberce');
                 $mail->addTo($userMail);
